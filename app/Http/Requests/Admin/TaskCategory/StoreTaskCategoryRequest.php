@@ -1,0 +1,20 @@
+<?php
+
+namespace App\Http\Requests\Admin\TaskCategory;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class StoreTaskCategoryRequest extends FormRequest
+{
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    public function rules(): array
+    {
+        return [
+            'name' => 'required|string|max:255|unique:task_categories,name',
+        ];
+    }
+}

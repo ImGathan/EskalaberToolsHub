@@ -1,0 +1,137 @@
+<?php
+
+use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\DepartmentController;
+use App\Http\Controllers\Admin\TaskCategoryController;
+use App\Http\Controllers\Admin\TaskController;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\ToolController;
+use App\Http\Controllers\Toolsman\UserController as ToolsmanUserController;
+use App\Http\Controllers\Toolsman\ToolController as ToolsmanToolController;
+use App\Http\Controllers\User\UserController as UserUserController;
+use App\Http\Controllers\User\ToolController as UserToolController;
+use App\Http\Controllers\User\LoanController as UserLoanController;
+use App\Http\Controllers\AuthController;
+use Illuminate\Support\Facades\Route;
+
+Route::get('/', function () {
+    return redirect()->route('admin.dashboard');
+});
+
+Route::get('/login', [AuthController::class, 'login'])->name('login');
+Route::post('/login', [AuthController::class, 'doLogin'])->name('login.post');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+// Admin Users Routes
+Route::middleware('auth', 'role:SUPERADMIN')->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/dashboard', function () {
+        return view('_admin.dashboard');
+    })->name('dashboard');
+
+    Route::prefix('users')->name('users.')->group(function () {
+        Route::get('/', [UserController::class, 'index'])->name('index');
+        Route::get('/add', [UserController::class, 'add'])->name('add');
+        Route::post('/create', [UserController::class, 'doCreate'])->name('create');
+        Route::get('/detail/{id}', [UserController::class, 'detail'])->name('detail');
+        Route::get('/update/{id}', [UserController::class, 'update'])->name('update');
+        Route::post('/update/{id}', [UserController::class, 'doUpdate'])->name('doUpdate');
+        Route::delete('/delete/{id}', [UserController::class, 'delete'])->name('delete');
+        Route::post('/reset-password/{id}', [UserController::class, 'resetPassword'])->name('resetPassword');
+    });
+
+    Route::prefix('departments')->name('departments.')->group(function () {
+        Route::get('/', [DepartmentController::class, 'index'])->name('index');
+        Route::get('/add', [DepartmentController::class, 'add'])->name('add');
+        Route::post('/create', [DepartmentController::class, 'doCreate'])->name('create');
+        Route::get('/update/{id}', [DepartmentController::class, 'update'])->name('update');
+        Route::post('/update/{id}', [DepartmentController::class, 'doUpdate'])->name('doUpdate');
+        Route::delete('/delete/{id}', [DepartmentController::class, 'delete'])->name('delete');
+    });
+
+    Route::prefix('categories')->name('categories.')->group(function () {
+        Route::get('/', [CategoryController::class, 'index'])->name('index');
+        Route::get('/add', [CategoryController::class, 'add'])->name('add');
+        Route::post('/create', [CategoryController::class, 'doCreate'])->name('create');
+        Route::get('/update/{id}', [CategoryController::class, 'update'])->name('update');
+        Route::post('/update/{id}', [CategoryController::class, 'doUpdate'])->name('doUpdate');
+        Route::delete('/delete/{id}', [CategoryController::class, 'delete'])->name('delete');
+    });
+
+    Route::prefix('tools')->name('tools.')->group(function () {
+        Route::get('/', [ToolController::class, 'index'])->name('index');
+        Route::get('/add', [ToolController::class, 'add'])->name('add');
+        Route::post('/create', [ToolController::class, 'doCreate'])->name('create');
+        Route::get('/update/{id}', [ToolController::class, 'update'])->name('update');
+        Route::post('/update/{id}', [ToolController::class, 'doUpdate'])->name('doUpdate');
+        Route::delete('/delete/{id}', [ToolController::class, 'delete'])->name('delete');
+    });
+
+    Route::prefix('task-categories')->name('task_categories.')->group(function () {
+        Route::get('/', [TaskCategoryController::class, 'index'])->name('index');
+        Route::get('/add', [TaskCategoryController::class, 'add'])->name('add');
+        Route::post('/create', [TaskCategoryController::class, 'doCreate'])->name('create');
+        Route::get('/update/{id}', [TaskCategoryController::class, 'update'])->name('update');
+        Route::post('/update/{id}', [TaskCategoryController::class, 'doUpdate'])->name('doUpdate');
+        Route::delete('/delete/{id}', [TaskCategoryController::class, 'delete'])->name('delete');
+    });
+
+    Route::prefix('tasks')->name('tasks.')->group(function () {
+        Route::get('/', [TaskController::class, 'index'])->name('index');
+        Route::get('/add', [TaskController::class, 'add'])->name('add');
+        Route::post('/create', [TaskController::class, 'doCreate'])->name('do_create');
+        Route::get('/detail/{id}', [TaskController::class, 'detail'])->name('detail');
+        Route::get('/update/{id}', [TaskController::class, 'update'])->name('update');
+        Route::post('/update/{id}', [TaskController::class, 'doUpdate'])->name('do_update');
+        Route::delete('/delete/{id}', [TaskController::class, 'delete'])->name('delete');
+    });
+
+    Route::prefix('profile')->name('profile.')->group(function () {
+        Route::get('/change-password', [UserController::class, 'changePassword'])->name('change_password');
+        Route::post('/change-password', [UserController::class, 'doChangePassword'])->name('do_change_password');
+    });
+});
+
+Route::middleware('auth', 'role:TOOLSMAN')->prefix('toolsman')->name('toolsman.')->group(function () {
+    Route::get('/dashboard', function () {
+        return view('_toolsman.dashboard');
+    })->name('dashboard');
+
+    Route::prefix('tools')->name('tools.')->group(function () {
+       Route::get('/', [ToolsmanToolController::class, 'index'])->name('index'); 
+       Route::get('/add', [ToolsmanToolController::class, 'add'])->name('add');
+       Route::post('/create', [ToolsmanToolController::class, 'doCreate'])->name('create');
+       Route::get('/update/{id}', [ToolsmanToolController::class, 'update'])->name('update');
+       Route::post('/update/{id}', [ToolsmanToolController::class, 'doUpdate'])->name('do_update');
+       Route::delete('/delete/{id}', [ToolsmanToolController::class, 'delete'])->name('delete'); 
+    });
+
+    Route::prefix('profile')->name('profile.')->group(function () {
+        Route::get('/change-password', [ToolsmanUserController::class, 'changePassword'])->name('change_password');
+        Route::post('/change-password', [ToolsmanUserController::class, 'doChangePassword'])->name('do_change_password');
+    });
+
+});
+
+
+Route::middleware('auth', 'role:USER')->prefix('user')->name('user.')->group(function () {
+    Route::get('/dashboard', function () {
+        return view('_user.dashboard');
+    })->name('dashboard');
+
+    Route::prefix('profile')->name('profile.')->group(function () {
+        Route::get('/change-password', [UserUserController::class, 'changePassword'])->name('change_password');
+        Route::post('/change-password', [UserUserController::class, 'doChangePassword'])->name('do_change_password');
+    });
+
+    Route::prefix('tools')->name('tools.')->group(function () {
+        Route::get('/', [UserToolController::class, 'index'])->name('index');
+    });
+
+    Route::prefix('loans')->name('loans.')->group(function () {
+        Route::get('/', [UserLoanController::class, 'index'])->name('index');
+        Route::get('/add', [UserLoanController::class, 'add'])->name('add');
+        Route::post('/create', [UserLoanController::class, 'doCreate'])->name('create');
+        Route::get('/detail/{id}', [UserLoanController::class, 'detail'])->name('detail');
+    });
+
+});
