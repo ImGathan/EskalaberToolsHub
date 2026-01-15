@@ -14,11 +14,17 @@ class Tool extends Model
         'image',
         'quantity',
         'status',
+        'place_id',
     ];
 
     public function category()
     {
         return $this->belongsTo(Category::class, 'category_id');
+    }
+
+    public function place()
+    {
+        return $this->belongsTo(Place::class, 'place_id');
     }
 
     public function toolsman()

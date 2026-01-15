@@ -16,8 +16,7 @@ class CategoryController extends Controller
         $keywords = $request->get('keywords');
         $categories = Category::with('toolsman')->when($keywords, function ($query, $keywords) {
             return $query->where('name', 'like', '%'.$keywords.'%');
-        })->get();
-
+        })->paginate(20)->withQueryString();
         return view('_admin.category.index', compact('categories', 'keywords'));
     }
 

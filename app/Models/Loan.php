@@ -74,11 +74,20 @@ class Loan extends Model
         if ($this->status === 'pending') return 'Menunggu Persetujuan';
         
         if ($this->status === 'approve') {
-            if (now()->greaterThan(Carbon::parse($this->due_date))) {
-                return "Terlambat ";
+            $dueDate = \Carbon\Carbon::parse($this->due_date);
+            
+            $now = now()->startOfDay(); 
+            $dueDate = \Carbon\Carbon::parse($this->due_date)->startOfDay();
+
+            if ($now->greaterThan($dueDate)) {
+                $days = $now->diffInDays($dueDate);
+                return "Terlambat " . $days . " Hari";
             }
+                        
             return 'Dalam Peminjaman';
         }
+
+        if ($this->status === 'reject') return 'Peminjaman Ditolak';
 
         if ($this->status === 'returned') return 'Sudah Dikembalikan';
 

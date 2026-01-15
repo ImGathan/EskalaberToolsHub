@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Tool;
 use App\Models\Category;
+use App\Models\Place;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 
@@ -14,7 +15,7 @@ class ToolController extends Controller
     public function index(Request $request) {
         $userId = Auth::user()->id;
         $keywords = $request->get('keywords');
-        $tools = Tool::with('category.toolsman')
+        $tools = Tool::with('category.toolsman', 'place')
         ->whereHas('category.toolsman', function ($query) use ($userId) {
             return $query->where('toolsman_id', $userId);
         })
@@ -29,7 +30,8 @@ class ToolController extends Controller
     public function add() {
         $userId = Auth::user()->id;
         $categories = Category::where('toolsman_id', $userId)->get();
-        return view('_toolsman.tool.add', compact('categories'));
+        $places = Place::all();
+        return view('_toolsman.tool.add', compact('categories', 'places'));
     }
 
     public function doCreate(Request $request) {
@@ -42,6 +44,7 @@ class ToolController extends Controller
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'name' => 'required',
             'quantity' => 'required|numeric',
+            'place_id' => 'required',
         ]);
 
         $data = $request->all();
@@ -67,14 +70,15 @@ class ToolController extends Controller
             $q->where('toolsman_id', $userId);
         })->findOrFail($id);
         $categories = Category::all();
-        return view('_toolsman.tool.update', compact('tool', 'categories'));
+        $places = Place::all();
+        return view('_toolsman.tool.update', compact('tool', 'categories', 'places'));
     }
     
     public function doUpdate(int $id, Request $request) {
 
         $userId = Auth::user()->id;
         $category = Category::where('toolsman_id', $userId)->first();
-
+        
         $tool = Tool::whereHas('category.toolsman', function($q) use ($userId){
             $q->where('toolsman_id', $userId);
         })->findOrFail($id);
@@ -83,6 +87,7 @@ class ToolController extends Controller
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'name' => 'required',
             'quantity' => 'required|numeric',
+            'place_id' => 'required',
         ]);
         
         $data['category_id'] = $category->id;
@@ -111,7 +116,10 @@ class ToolController extends Controller
     }
     
     public function delete(int $id) {
-        $tool = Tool::findOrFail($id);
+        $userId = Auth::user()->id;
+        $tool = Tool::whereHas('category.toolsman', function($q) use ($userId){
+            $q->where('toolsman_id', $userId);
+        })->findOrFail($id);
         if ($tool->image) {
             Storage::disk('public')->delete($tool->image);
         }

@@ -4,12 +4,13 @@
 
 @section('content')
 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-    <div class="bg-white overflow-hidden shadow-lg rounded-2xl dark:bg-neutral-800 border-2 border-gray-100 dark:border-neutral-700">
+    <div class="bg-white overflow-hidden shadow-md shadow-indigo-500/10 rounded-2xl dark:bg-neutral-800 border border-gray-100 dark:border-neutral-700">
         <div class="px-6 py-4 border-b border-gray-200 dark:border-neutral-700 flex items-center">
             <a href="{{ route('user.tools.index') }}"
                 class="py-3 px-3 inline-flex items-center gap-x-2 text-xl rounded-xl border border-gray-200 bg-white text-gray-800 shadow-md hover:bg-gray-50 dark:bg-neutral-800 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-700 cursor-pointer">
                 <svg class="shrink-0 size-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="m12 19-7-7 7-7" /><path d="M19 12H5" />
+                    <path d="m12 19-7-7 7-7" />
+                    <path d="M19 12H5" />
                 </svg>
             </a>
             <div class="ms-3">
@@ -25,8 +26,8 @@
             <div class="space-y-4">
                 {{-- Preview Barang yang Dipilih --}}
                 <div class="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-100 dark:border-blue-800 flex items-center gap-4">
-                    <img src="{{ $selectedTool->image ? asset('storage/' . $selectedTool->image) : asset('admin/images/empty-data.webp') }}" 
-                         class="h-16 w-16 object-cover rounded-lg border shadow-sm">
+                    <img src="{{ $selectedTool->image ? asset('storage/' . $selectedTool->image) : asset('admin/images/empty-data.webp') }}"
+                        class="h-16 w-16 object-cover rounded-lg border shadow-sm">
                     <div>
                         <h4 class="font-bold text-blue-900 dark:text-blue-300">{{ $selectedTool->name }}</h4>
                         <p class="text-xs text-blue-700 dark:text-blue-400">Stok Tersedia: <span id="max-stock">{{ $selectedTool->quantity }}</span></p>
@@ -42,7 +43,7 @@
                         class="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 @error('quantity') border-red-500 @enderror"
                         placeholder="Masukkan jumlah yang dipinjam" required>
                     @error('quantity')
-                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                    <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                     @enderror
                 </div>
 
@@ -54,7 +55,7 @@
                         required>
                     <p class="text-xs text-gray-500 mt-1 italic">* Harap kembalikan barang tepat waktu untuk menghindari denda.</p>
                     @error('due_date')
-                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                    <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                     @enderror
                 </div>
 
@@ -84,7 +85,11 @@
     <div class="hidden md:block">
         <div class="p-6 bg-gradient-to-br from-blue-600 to-blue-800 rounded-2xl shadow-xl text-white">
             <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info">
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M12 16v-4" />
+                    <path d="M12 8h.01" />
+                </svg>
                 Aturan Peminjaman
             </h3>
             <ul class="space-y-3 text-sm text-blue-100">

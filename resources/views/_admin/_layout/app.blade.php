@@ -13,8 +13,7 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700&display=swap"
-        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 
     <!-- Styles / Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/css/admin-custom.css', 'resources/js/admin-custom.js'])
@@ -81,10 +80,10 @@
     <div class="w-full lg:ps-64 bg-white dark:bg-neutral-900 min-h-screen">
         <div id="main-content" class="p-2 2xl:px-25 px-3 md:px-8 pt-10 sm:p-6 space-y-4 sm:space-y-6">
             @if (session('success'))
-                <div id="spa-flash-success" style="display: none;">{{ session('success') }}</div>
+            <div id="spa-flash-success" style="display: none;">{{ session('success') }}</div>
             @endif
             @if (session('error'))
-                <div id="spa-flash-error" style="display: none;">{{ session('error') }}</div>
+            <div id="spa-flash-error" style="display: none;">{{ session('error') }}</div>
             @endif
             @yield('content')
         </div>

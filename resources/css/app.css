@@ -1,4 +1,4 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 @plugin '@tailwindcss/forms';
 
 /* Enable class-based dark mode for Preline UI compatibility */
@@ -8,24 +8,105 @@
 @source '../../storage/framework/views/*.php';
 @source '../**/*.blade.php';
 @source '../**/*.js';
-@import '../../node_modules/preline/variants.css';
+@import "../../node_modules/preline/variants.css";
 @source '../../node_modules/preline/dist/*.js';
 
 @theme {
-    --font-sans: 'Google Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif,
+        "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
+        "Noto Color Emoji";
+
+    /* Override standard blue with Indigo for a more premium look */
+    --color-blue-50: oklch(0.97 0.01 270); /* indigo-50 */
+    --color-blue-100: oklch(0.93 0.03 270); /* indigo-100 */
+    --color-blue-200: oklch(0.89 0.06 270); /* indigo-200 */
+    --color-blue-300: oklch(0.82 0.09 270); /* indigo-300 */
+    --color-blue-400: oklch(0.71 0.14 270); /* indigo-400 */
+    --color-blue-500: oklch(0.6 0.18 270); /* indigo-500 */
+    --color-blue-600: oklch(0.5 0.19 270); /* indigo-600 */
+    --color-blue-700: oklch(0.42 0.17 270); /* indigo-700 */
+    --color-blue-800: oklch(0.35 0.13 270); /* indigo-800 */
+    --color-blue-900: oklch(0.3 0.1 270); /* indigo-900 */
+    --color-blue-950: oklch(0.18 0.06 270); /* indigo-950 */
 }
 
-/* Form Input Styling for Tailwind CSS v4 */
-input:where([type="text"], [type="email"], [type="password"], [type="number"], [type="tel"], [type="url"], [type="search"], [type="date"], [type="datetime-local"], [type="month"], [type="week"], [type="time"]),
+/* Global Background */
+body {
+    background-color: oklch(0.97 0.01 250); /* slate-50/gray-50 equivalent */
+}
+
+/* Form Input Styling */
+input:where(
+        [type="text"],
+        [type="email"],
+        [type="password"],
+        [type="number"],
+        [type="tel"],
+        [type="url"],
+        [type="search"],
+        [type="date"],
+        [type="datetime-local"],
+        [type="month"],
+        [type="week"],
+        [type="time"]
+    ),
 select,
 textarea {
-    border: 1px solid oklch(.928 .006 264.531) !important;
+    border: 1px solid var(--color-gray-200) !important;
+    border-radius: 0.5rem; /* rounded-lg */
+    padding-top: 0.625rem;
+    padding-bottom: 0.625rem;
+    font-size: 0.875rem;
+    transition-property: color, background-color, border-color,
+        text-decoration-color, fill, stroke;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 200ms;
+}
+
+input:where(
+        [type="text"],
+        [type="email"],
+        [type="password"],
+        [type="number"],
+        [type="tel"],
+        [type="url"],
+        [type="search"],
+        [type="date"],
+        [type="datetime-local"],
+        [type="month"],
+        [type="week"],
+        [type="time"]
+    ):focus,
+select:focus,
+textarea:focus {
+    border-color: var(--color-blue-500) !important;
+    outline: 2px solid transparent !important;
+    outline-offset: 2px !important;
+    --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0
+        var(--tw-ring-offset-width) var(--tw-ring-offset-color) !important;
+    --tw-ring-shadow: var(--tw-ring-inset) 0 0 0
+        calc(3px + var(--tw-ring-offset-width)) var(--color-blue-200) !important;
+    box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow),
+        var(--tw-shadow, 0 0 #0000) !important;
 }
 
 /* Dark mode border colors */
-.dark input:where([type="text"], [type="email"], [type="password"], [type="number"], [type="tel"], [type="url"], [type="search"], [type="date"], [type="datetime-local"], [type="month"], [type="week"], [type="time"]),
+.dark
+    input:where(
+        [type="text"],
+        [type="email"],
+        [type="password"],
+        [type="number"],
+        [type="tel"],
+        [type="url"],
+        [type="search"],
+        [type="date"],
+        [type="datetime-local"],
+        [type="month"],
+        [type="week"],
+        [type="time"]
+    ),
 .dark select,
 .dark textarea {
-    border-color: oklch(.371 0 0) !important;
+    border-color: oklch(0.371 0 0) !important;
 }

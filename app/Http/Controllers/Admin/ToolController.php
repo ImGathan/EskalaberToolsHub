@@ -6,13 +6,14 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Tool;
 use App\Models\Category;
+use App\Models\Place;
 use Illuminate\Support\Facades\Storage;
 
 class ToolController extends Controller
 {
     public function index(Request $request) {
         $keywords = $request->get('keywords');
-        $tools = Tool::with('category.toolsman')->when($keywords, function ($query, $keywords) {
+        $tools = Tool::with('category.toolsman', 'place')->when($keywords, function ($query, $keywords) {
             return $query->where('name', 'like', '%'.$keywords.'%');
         })->get();
 
@@ -21,7 +22,7 @@ class ToolController extends Controller
 
     public function add() {
         $categories = Category::all();
-        return view('_admin.tool.add', compact('categories'));
+        return view('_admin.tool.add', compact('categories', 'places'));
     }
 
     public function doCreate(Request $request) {
@@ -29,6 +30,7 @@ class ToolController extends Controller
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'name' => 'required',
             'category_id' => 'required',
+            'place_id' => 'required',
             'quantity' => 'required|numeric',
         ]);
 
@@ -51,7 +53,8 @@ class ToolController extends Controller
     public function update(int $id) {
         $tool = Tool::findOrFail($id);
         $categories = Category::all();
-        return view('_admin.tool.update', compact('tool', 'categories'));
+        $places = Place::all();
+        return view('_admin.tool.update', compact('tool', 'categories', 'places'));
     }
     
     public function doUpdate(int $id, Request $request) {
@@ -62,6 +65,7 @@ class ToolController extends Controller
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'name' => 'required',
             'category_id' => 'required',
+            'place_id' => 'required',
             'quantity' => 'required|numeric',
         ]);
         

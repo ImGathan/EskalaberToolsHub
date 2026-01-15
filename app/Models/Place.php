@@ -5,13 +5,18 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Department extends Model
+class Place extends Model
 {
     use HasFactory;
 
-    protected $table = 'departments';
+    protected $table = 'places';
 
     protected $fillable = [
         'name',
     ];
+
+    public function tools()
+    {
+        return $this->hasMany(Tool::class, 'place_id');
+    }
 }

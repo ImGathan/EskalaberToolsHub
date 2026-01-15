@@ -12,17 +12,41 @@ use Illuminate\Support\Facades\Auth;
 class LoanController extends Controller
 {
 
-    public function index() {
-        $loans = Loan::with(['tool.category'])
-            ->where('user_id', Auth::id())
-            ->orderBy('loan_date', 'desc') // Terbaru di atas
-            ->get()
+    public function index(Request $request) {
+        $keywords = $request->get('keywords');
+
+        $query = Loan::with(['tool.category'])
+            ->where('user_id', Auth::id());
+
+        if ($keywords) {
+            $query->whereHas('tool', function($q) use ($keywords) {
+                $q->where('name', 'like', '%' . $keywords . '%');
+            });
+        }
+
+        // 1. Di tingkat Database: Urutkan loan_date DESC, lalu ID DESC
+        $loans = $query->orderBy('loan_date', 'desc')
+                    ->orderBy('id', 'desc')
+                    ->paginate(20);
+
+        // 2. Di tingkat Collection (PHP):
+        $groupedLoans = $loans->getCollection()
             ->groupBy(function($item) {
-                // Mengelompokkan berdasarkan tanggal saja (tanpa jam)
                 return \Carbon\Carbon::parse($item->loan_date)->format('Y-m-d');
-        });
-        
-        return view('_user.loan.index', compact('loans'));
+            })
+            ->map(function ($items) {
+                // Urutkan item di dalam grup: 
+                // Pertama berdasarkan loan_date DESC, jika sama, berdasarkan ID DESC
+                return $items->sort(function ($a, $b) {
+                    if ($a->loan_date === $b->loan_date) {
+                        return $b->id <=> $a->id; // ID terbaru di atas
+                    }
+                    return $b->loan_date <=> $a->loan_date; // Tanggal terbaru di atas
+                });
+            })
+            ->sortKeysDesc(); // Grup tanggal terbaru tetap di paling atas
+
+        return view('_user.loan.index', compact('loans', 'groupedLoans', 'keywords'));
     }
     
     public function add(Request $request) {
@@ -54,7 +78,7 @@ class LoanController extends Controller
         $data['loan_date']   = now();
         $data['status']      = 'pending';
         $data['fine_amount'] = 0;
-        $data['information'] = "Menunggu Persetujuan";
+        $data['information'] = "";
 
         Loan::create($data);
         return redirect()->route('user.dashboard')->with('success', 'Loan created successfully');

@@ -85,15 +85,39 @@
                         Keterangan Peminjaman
                     </p>
                     <p class="text-sm text-gray-800 dark:text-neutral-200 italic">
-                        "{{ $data->information }}"
+                        "{{ $data->keterangan_status }}"
+                    </p>
+                </div>
+
+                <div class="mt-6 p-4 bg-gray-50 rounded-xl dark:bg-neutral-700/50 border border-gray-100 dark:border-neutral-700">
+                    <p class="text-xs text-gray-500 dark:text-neutral-400 uppercase tracking-wide font-semibold mb-2">
+                        Keterangan Lokasi
+                    </p>
+                    <p class="text-sm text-gray-800 dark:text-neutral-200 italic">
+                        "Anda bisa mangambil barang di {{ $data->tool->place->name }}"
                     </p>
                 </div>
             </div>
         </div>
 
-        @if($data->status === 'approve' && now()->greaterThan($data->due_date))
+        @if($data->status === 'approve' && now()->startOfDay()->greaterThan($data->due_date->startOfDay()))
             {{-- Kolom Kanan: Ringkasan Biaya/Denda (Jika Ada) --}}
             <div class="space-y-6">
+
+                {{-- Alert Jika Terlambat --}}
+                @if(now()->startOfDay()->greaterThan($data->due_date->startOfDay()) && $data->status === 'approve')
+                <div class="bg-red-50 border border-red-200 rounded-xl p-4 dark:bg-red-800/10 dark:border-red-900">
+                    <div class="flex">
+                        <svg class="shrink-0 size-4 text-red-600 mt-0.5 dark:text-red-500" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        <div class="ms-3">
+                            <p class="text-sm text-red-700 dark:text-red-400 font-medium">
+                                Peminjaman melewati batas waktu. Segera lakukan pengembalian barang ke admin.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                @endif
+
                 <div class="bg-white shadow-lg rounded-2xl p-6 dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700">
                     <h4 class="text-sm font-bold text-gray-800 dark:text-neutral-200 uppercase mb-4">Ringkasan Biaya</h4>
                     <div class="space-y-3">
@@ -114,19 +138,7 @@
                     </div>
                 </div>
                 
-                {{-- Alert Jika Terlambat --}}
-                @if(now()->greaterThan($data->due_date) && $data->status === 'approve')
-                <div class="bg-red-50 border border-red-200 rounded-xl p-4 dark:bg-red-800/10 dark:border-red-900">
-                    <div class="flex">
-                        <svg class="shrink-0 size-4 text-red-600 mt-0.5 dark:text-red-500" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                        <div class="ms-3">
-                            <p class="text-sm text-red-700 dark:text-red-400 font-medium">
-                                Peminjaman melewati batas waktu. Segera lakukan pengembalian barang ke admin.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-                @endif
+                
             </div>
         @endif
     </div>
