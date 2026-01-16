@@ -5,10 +5,10 @@
 @section('content')
 
     {{-- 1. Card Peringatan --}}
-    @if(isset($lateLoans) && $lateLoans->count() > 0)
+   
     <div class="mb-6 space-y-3">
-        @foreach($lateLoans as $loan)
-        <div class="flex flex-col bg-red-50 border border-red-200 shadow-sm rounded-xl dark:bg-red-800/10 dark:border-red-900">
+        @forelse($loans as $loan)
+        <a href="{{ route('user.loans.detail', $loan->id) }}" class="flex flex-col bg-red-50 border border-red-200 shadow-sm rounded-xl dark:bg-red-800/10 dark:border-red-900">
             <div class="p-4 md:p-5">
                 <div class="flex">
                     <svg class="shrink-0 size-5 text-red-600 mt-0.5 dark:text-red-500" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -17,20 +17,21 @@
 
                     <div class="ms-3">
                         <h3 class="text-sm font-semibold text-red-800 dark:text-red-500">
-                            Peminjaman Terlambat: {{ $loan->tool->name ?? 'Barang Tidak Diketahui' }}
+                            Anda Mempunyai Peminjaman Terlambat: {{ $loan->tool->name ?? 'Barang Tidak Diketahui' }} ({{ $loan->quantity }} Unit)
                         </h3>
                         <p class="mt-1 text-sm text-red-700 dark:text-red-400">
-                            Harus kembali: <strong>{{ \Carbon\Carbon::parse($loan->due_date)->format('d M Y') }}</strong> 
+                            Tanggal Jatuh Tempo: <strong>{{ \Carbon\Carbon::parse($loan->due_date)->format('d M Y') }}</strong> 
                             <span class="mx-2">|</span>
-                            Denda: <span class="font-bold">Rp {{ number_format($loan->fine_amount, 0, ',', '.') }}</span>
+                            Tagihan Denda: <span class="font-bold">Rp {{ number_format($loan->fine_amount, 0, ',', '.') }}</span>
                         </p>
                     </div>
                 </div>
             </div>
-        </div>
-        @endforeach
+        </a>
+        @empty
+        @endforelse
     </div>
-    @endif
+   
 
     <!-- Grid -->
     <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">

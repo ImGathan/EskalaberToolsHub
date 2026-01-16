@@ -10,14 +10,29 @@ use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
-    public function index()
-    {
-        $lateLoans = Loan::with('tool')
-            ->where('user_id', Auth::id())
-            ->where('status', 'approve')
-            ->where('due_date', '<', Carbon::now())
-            ->get();
+    public function index(Request $request) {
+        $keywords = $request->get('keywords');
+        $now = Carbon::now()->startOfDay();
 
-        return view('_user.dashboard', compact('lateLoans'));
+        $query = Loan::with(['tool.category'])
+            ->where('user_id', Auth::id())
+            ->where(function ($query) {
+                $query->where('status', 'approve')
+                      ->orWhere('status', 'returned');
+            })
+            ->where('due_date', '<', $now);
+
+        if ($keywords) {
+            $query->whereHas('tool', function($q) use ($keywords) {
+                $q->where('name', 'like', '%' . $keywords . '%');
+            });
+        }
+
+        $loans = $query->orderBy('loan_date', 'desc')
+                    ->orderBy('id', 'desc')
+                    ->paginate(20);
+
+    
+        return view('_user.dashboard', compact('loans', 'keywords'));
     }
 }

@@ -9,7 +9,7 @@
             Data Peminjaman User
         </h1>
         <p class="text-md text-gray-400 dark:text-neutral-400">
-            Kelola persetujuan dan pemantauan barang.
+            Kelola persetujuan, pemantauan, dan riwayat peminjaman barang.
         </p>
     </div>
 </div>
@@ -31,9 +31,9 @@
                 {{ $countApprove ?? 0 }}
             </span>
         </a>
-        <a href="{{ route('toolsman.loans.index', ['status' => 'reject']) }}"
-            class="py-4 px-1 inline-flex items-center gap-x-2 border-b-2 {{ request('status') == 'reject' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-blue-600' }} text-sm font-medium whitespace-nowrap">
-            Peminjaman Ditolak
+        <a href="{{ route('toolsman.loans.index', ['status' => 'history']) }}"
+            class="py-4 px-1 inline-flex items-center gap-x-2 border-b-2 {{ request('status') == 'history' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-blue-600' }} text-sm font-medium whitespace-nowrap">
+            Riwayat Peminjaman
             <!-- <span class="inline-flex items-center py-0.5 px-1.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-neutral-700 dark:text-neutral-300">
                 {{ $countReject ?? 0 }}
             </span> -->
@@ -87,8 +87,8 @@
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-neutral-200">
                         <div class="flex flex-col">
                             <span class="inline-flex items-center py-1 rounded-full text-sm font-medium {{ $loan->status_color }}">{{ $loan->keterangan_status }}</span>
-                            @if($loan->fine_amount > 0)
-                                <span class="text-xs text-gray-500">Denda {{ $loan->fine_amount }}</span>
+                            @if($loan->status === 'approve' && now()->startOfDay()->greaterThan($loan->due_date->startOfDay()))
+                                <span class="text-xs text-gray-500">Denda Rp.{{ number_format($loan->fine_amount, 0, ',', '.') }}</span>
                             @endif
                         </div>
                     </td>

@@ -44,21 +44,29 @@ class Loan extends Model
     protected static function booted()
     {
         static::retrieved(function ($loan) {
-            // Jika masih dipinjam (approve)
+            $now = now()->startOfDay();
+
+            if ($loan->status === 'pending') {
+                if ($loan->created_at->diffInHours($now) >= 24) {
+                    $loan->status = 'reject';
+                    $loan->information = "Ditolak otomatis karena tidak ada persetujuan dalam 24 jam.";
+                    $loan->saveQuietly();
+                    return;
+                }
+            }
+
             if ($loan->status === 'approve' && $loan->due_date) {
-                $now = now()->startOfDay();
                 $due = Carbon::parse($loan->due_date)->startOfDay();
 
                 if ($now->greaterThan($due)) {
-                    $hariTerlambat = $now->diffInDays($due);
-                    $totalDenda = $hariTerlambat * 5000;
+                    $hariTerlambat = abs($now->diffInDays($due));
+                    $jumlahPinjam = $loan->quantity;
+                    $totalDenda = $hariTerlambat * 5000 * $jumlahPinjam;
 
-                    // Update fisik ke DB jika ada perubahan nilai
                     if ($loan->fine_amount != $totalDenda) {
                         $loan->fine_amount = $totalDenda;
                         $loan->information = "Terlambat $hariTerlambat hari. Denda: Rp " . number_format($totalDenda, 0, ',', '.');
                         
-                        // saveQuietly agar tidak memicu event retrieved lagi (mencegah infinite loop)
                         $loan->saveQuietly(); 
                     }
                 }
@@ -66,21 +74,17 @@ class Loan extends Model
         });
     }
 
-    /**
-     * ACCESSOR: Untuk tampilan di View nanti
-     */
+    
     public function getKeteranganStatusAttribute()
     {
         if ($this->status === 'pending') return 'Menunggu Persetujuan';
         
         if ($this->status === 'approve') {
-            $dueDate = \Carbon\Carbon::parse($this->due_date);
-            
             $now = now()->startOfDay(); 
             $dueDate = \Carbon\Carbon::parse($this->due_date)->startOfDay();
 
             if ($now->greaterThan($dueDate)) {
-                $days = $now->diffInDays($dueDate);
+                $days = abs($now->diffInDays($dueDate));
                 return "Terlambat " . $days . " Hari";
             }
                         
@@ -89,9 +93,54 @@ class Loan extends Model
 
         if ($this->status === 'reject') return 'Peminjaman Ditolak';
 
-        if ($this->status === 'returned') return 'Sudah Dikembalikan';
+        if ($this->status === 'returned') {
+            
+            $now = now()->startOfDay(); 
+            $dueDate = \Carbon\Carbon::parse($this->due_date)->startOfDay();
+
+            if ($now->greaterThan($dueDate)) {
+                $days = abs($now->diffInDays($dueDate));
+                return "Terlambat " . $days . " Hari";
+            }
+
+            return 'Dikembalikan Tepat Waktu';
+        } 
 
         return '-';
+    }
+
+    public function getStatusColorAttribute()
+    {
+        // Menggunakan tailwind classes (sesuaikan dengan framework CSS kamu)
+        switch ($this->status) {
+            case 'pending':
+                return 'text-yellow-700 dark:text-yellow-500';
+            
+            case 'approve':
+                // Cek jika sudah approve tapi terlambat
+                $now = now()->startOfDay();
+                $due = \Carbon\Carbon::parse($this->due_date)->startOfDay();
+                
+                if ($now->greaterThan($due)) {
+                    return 'text-red-700 dark:text-red-500';
+                }
+                return 'text-blue-700 dark:text-blue-500';
+
+            case 'reject':
+                return 'text-gray-700 dark:text-neutral-300';
+
+            case 'returned':
+                $now = now()->startOfDay();
+                $due = \Carbon\Carbon::parse($this->due_date)->startOfDay();
+                
+                if ($now->greaterThan($due)) {
+                    return 'text-red-700 dark:text-red-500';
+                }
+                return 'text-green-700 dark:text-green-500';
+
+            default:
+                return 'text-gray-700';
+        }
     }
 
     public function getHariTerlambatAttribute()
@@ -109,7 +158,7 @@ class Loan extends Model
         }
 
         // Hitung selisih hari ini dengan due_date
-        return (int) now()->diffInDays($this->due_date);
+        return (int) abs(now()->diffInDays($this->due_date));
     }
 
 }

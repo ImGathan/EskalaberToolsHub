@@ -12,6 +12,7 @@ use App\Http\Controllers\Toolsman\LoanController as ToolsmanLoanController;
 use App\Http\Controllers\User\UserController as UserUserController;
 use App\Http\Controllers\User\ToolController as UserToolController;
 use App\Http\Controllers\User\LoanController as UserLoanController;
+use App\Http\Controllers\User\DashboardController as UserDashboardController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 
@@ -122,9 +123,7 @@ Route::middleware('auth', 'role:TOOLSMAN')->prefix('toolsman')->name('toolsman.'
 
 
 Route::middleware('auth', 'role:USER')->prefix('user')->name('user.')->group(function () {
-    Route::get('/dashboard', function () {
-        return view('_user.dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', [UserDashboardController::class, 'index'])->name('dashboard');
 
     Route::prefix('profile')->name('profile.')->group(function () {
         Route::get('/change-password', [UserUserController::class, 'changePassword'])->name('change_password');

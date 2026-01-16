@@ -21,7 +21,13 @@ class LoanController extends Controller
             ->whereHas('tool.category.toolsman', function($query) use ($userId) {
                 $query->where('toolsman_id', $userId);
             })
-            ->where('status', $status)
+            ->where(function ($query) use ($status) {
+                if ($status === 'history') {
+                    $query->whereIn('status', ['reject', 'returned']);
+                } else {
+                    $query->where('status', $status);
+                }
+            })
             ->when($keywords, function($query) use ($keywords) {
                 $query->whereHas('user', function($q) use ($keywords) {
                     $q->where('username', 'like', "%$keywords%");
@@ -31,6 +37,8 @@ class LoanController extends Controller
             })
             ->orderBy('loan_date', 'desc')
             ->paginate(10);
+
+        
 
         // Menghitung jumlah yang pending untuk ditampilkan di badge tab
         $countPending = Loan::whereHas('tool.category.toolsman', function($query) use ($userId) {

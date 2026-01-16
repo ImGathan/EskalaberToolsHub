@@ -37,4 +37,16 @@ class Tool extends Model
         return $this->hasMany(Loan::class, 'tool_id');
     }
 
+
+    public static function booted() 
+    {
+        static::updated(function ($tool) {
+            if ($tool->quantity == 0) {
+                $tool->status = 'Tidak Tersedia';
+            } else {
+                $tool->status = 'Tersedia';
+            }
+        });
+    }
+
 }

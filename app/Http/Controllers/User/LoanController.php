@@ -46,6 +46,7 @@ class LoanController extends Controller
             })
             ->sortKeysDesc(); // Grup tanggal terbaru tetap di paling atas
 
+    
         return view('_user.loan.index', compact('loans', 'groupedLoans', 'keywords'));
     }
     
@@ -81,7 +82,7 @@ class LoanController extends Controller
         $data['information'] = "";
 
         Loan::create($data);
-        return redirect()->route('user.dashboard')->with('success', 'Loan created successfully');
+        return redirect()->route('user.loans.index')->with('success', 'Loan created successfully');
     }
 
     public function detail($id) {
