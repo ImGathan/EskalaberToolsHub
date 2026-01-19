@@ -48,7 +48,7 @@
                 </div>
 
                 {{-- Grid Detail Waktu --}}
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div class="p-4 bg-gray-50 rounded-xl dark:bg-neutral-700/50 border border-gray-100 dark:border-neutral-700">
                         <p class="text-xs text-gray-500 dark:text-neutral-400 uppercase tracking-wide font-semibold mb-1">
                             Tanggal Pinjam
@@ -73,7 +73,7 @@
                             Tanggal Dikembalikan
                         </p>
                         <p class="text-sm font-medium text-green-800 dark:text-green-300">
-                            {{ \Carbon\Carbon::parse($data->return_date)->translatedFormat('d F Y, H:i') }}
+                            {{ \Carbon\Carbon::parse($data->return_date)->translatedFormat('d F Y') }}
                         </p>
                     </div>
                     @endif
@@ -100,7 +100,7 @@
             </div>
         </div>
 
-        @if($data->status === 'approve' || $data->status === 'returned' && now()->startOfDay()->greaterThan($data->due_date->startOfDay()))
+        @if($data->status === 'returned' && now()->startOfDay()->greaterThan($data->due_date->startOfDay()))
             {{-- Kolom Kanan: Ringkasan Biaya/Denda (Jika Ada) --}}
             <div class="space-y-6">
 
@@ -111,7 +111,7 @@
                         <svg class="shrink-0 size-4 text-red-600 mt-0.5 dark:text-red-500" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                         <div class="ms-3">
                             <p class="text-sm text-red-700 dark:text-red-400 font-medium">
-                                Peminjaman melewati batas waktu. Segera lakukan pengembalian barang ke admin.
+                                Anda mempunyai tagihan keterlambatan. Segera lakukan pembayaran denda ke admin!
                             </p>
                         </div>
                     </div>
@@ -128,6 +128,10 @@
                         <div class="flex justify-between text-sm">
                             <span class="text-gray-500">Jumlah Barang Dipinjam</span>
                             <span class="font-medium text-gray-800 dark:text-neutral-200">{{ $data->quantity }} Unit</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-500">Harga Denda Barang</span>
+                            <span class="font-medium text-gray-800 dark:text-neutral-200">Rp. {{ number_format($data->tool->fine, 0, ',', '.') }}</span>
                         </div>
                         <div class="flex justify-between text-sm">
                             <span class="text-gray-500">Hari Keterlambatan</span>

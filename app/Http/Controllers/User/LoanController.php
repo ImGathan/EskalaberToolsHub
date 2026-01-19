@@ -86,7 +86,9 @@ class LoanController extends Controller
     }
 
     public function detail($id) {
-        $data = Loan::with(['tool.category'])->find($id);
+        $data = Loan::with(['tool.category'])
+            ->where('user_id', Auth::id()) // Pastikan ini milik user yang login
+            ->findOrFail($id);
         return view('_user.loan.detail', compact('data'));
     }
 

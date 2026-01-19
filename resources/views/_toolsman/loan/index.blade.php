@@ -86,8 +86,14 @@
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-neutral-200">
                         <div class="flex flex-col">
-                            <span class="inline-flex items-center py-1 rounded-full text-sm font-medium {{ $loan->status_color }}">{{ $loan->keterangan_status }}</span>
                             @if($loan->status === 'approve' && now()->startOfDay()->greaterThan($loan->due_date->startOfDay()))
+                                <span class="inline-flex items-center py-1 rounded-full text-sm font-medium {{ $loan->status_color }}">Dalam Peminjaman ({{ $loan->keterangan_status }})</span>
+                            @elseif($loan->status === 'returned' && now()->startOfDay()->greaterThan($loan->due_date->startOfDay()))
+                                <span class="inline-flex items-center py-1 rounded-full text-sm font-medium {{ $loan->status_color }}">Dikembalikan {{ $loan->keterangan_status }}</span>
+                            @else
+                                <span class="inline-flex items-center py-1 rounded-full text-sm font-medium {{ $loan->status_color }}">{{ $loan->keterangan_status }}</span>
+                            @endif
+                            @if($loan->status === 'returned' && now()->startOfDay()->greaterThan($loan->due_date->startOfDay()))
                                 <span class="text-xs text-gray-500">Denda Rp.{{ number_format($loan->fine_amount, 0, ',', '.') }}</span>
                             @endif
                         </div>

@@ -64,7 +64,10 @@ class LoanController extends Controller
         }
 
         DB::transaction(function() use ($loan) {
-            $loan->update(['status'=>'approve']);
+            $loan->update([
+                'status'=>'approve',
+                'approve_date' => now()
+            ]);
             $loan->tool->update(['quantity' => $loan->tool->quantity - $loan->quantity]);
         });
 
@@ -89,7 +92,10 @@ class LoanController extends Controller
         $loan = Loan::findOrFail($id);
 
         DB::transaction(function() use ($loan) {
-            $loan->update(['status'=>'returned']);
+            $loan->update([
+                'status'=>'returned',
+                'return_date' => now()
+            ]);
             $loan->tool->update(['quantity' => $loan->tool->quantity + $loan->quantity]);
         });
 

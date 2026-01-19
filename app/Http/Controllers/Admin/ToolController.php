@@ -32,6 +32,7 @@ class ToolController extends Controller
             'category_id' => 'required',
             'place_id' => 'required',
             'quantity' => 'required|numeric',
+            'fine' => 'required|numeric',
         ]);
 
         $data = $request->all();
@@ -67,6 +68,7 @@ class ToolController extends Controller
             'category_id' => 'required',
             'place_id' => 'required',
             'quantity' => 'required|numeric',
+            'fine' => 'required|numeric',
         ]);
         
         $data = $request->except('image');

@@ -17,8 +17,7 @@ class DashboardController extends Controller
         $query = Loan::with(['tool.category'])
             ->where('user_id', Auth::id())
             ->where(function ($query) {
-                $query->where('status', 'approve')
-                      ->orWhere('status', 'returned');
+                $query->where('status', 'returned');
             })
             ->where('due_date', '<', $now);
 

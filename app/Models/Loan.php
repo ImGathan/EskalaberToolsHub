@@ -46,8 +46,9 @@ class Loan extends Model
         static::retrieved(function ($loan) {
             $now = now()->startOfDay();
 
+            // 1. Logika Reject Otomatis
             if ($loan->status === 'pending') {
-                if ($loan->created_at->diffInHours($now) >= 24) {
+                if ($loan->created_at->diffInHours(now()) >= 24) {
                     $loan->status = 'reject';
                     $loan->information = "Ditolak otomatis karena tidak ada persetujuan dalam 24 jam.";
                     $loan->saveQuietly();
@@ -55,25 +56,30 @@ class Loan extends Model
                 }
             }
 
-            if ($loan->status === 'approve' && $loan->due_date) {
-                $due = Carbon::parse($loan->due_date)->startOfDay();
+        // 2. Logika Denda: Berjalan jika 'approve', Berhenti jika 'returned'
+        if (in_array($loan->status, ['approve', 'returned']) && $loan->due_date) {
+            $due = Carbon::parse($loan->due_date)->startOfDay();
+            
+            // KUNCINYA DI SINI:
+            // Jika status returned, gunakan return_date sebagai batas akhir hitungan denda.
+            // Jika status approve, gunakan waktu sekarang ($now) sehingga denda terus berjalan.
+            $batasWaktu = ($loan->status === 'returned' && $loan->return_date) 
+                          ? Carbon::parse($loan->return_date)->startOfDay() 
+                          : $now;
 
-                if ($now->greaterThan($due)) {
-                    $hariTerlambat = abs($now->diffInDays($due));
-                    $jumlahPinjam = $loan->quantity;
-                    $totalDenda = $hariTerlambat * 5000 * $jumlahPinjam;
+                if ($batasWaktu->greaterThan($due)) {
+                    $hariTerlambat = abs((int) $batasWaktu->diffInDays($due));
+                    $totalDenda = $hariTerlambat * $loan->tool->fine * $loan->quantity;
 
                     if ($loan->fine_amount != $totalDenda) {
                         $loan->fine_amount = $totalDenda;
                         $loan->information = "Terlambat $hariTerlambat hari. Denda: Rp " . number_format($totalDenda, 0, ',', '.');
-                        
                         $loan->saveQuietly(); 
                     }
                 }
             }
         });
     }
-
     
     public function getKeteranganStatusAttribute()
     {
@@ -95,11 +101,11 @@ class Loan extends Model
 
         if ($this->status === 'returned') {
             
-            $now = now()->startOfDay(); 
+            $batasWaktu = $this->return_date ? $this->return_date->startOfDay() : now()->startOfDay(); 
             $dueDate = \Carbon\Carbon::parse($this->due_date)->startOfDay();
 
-            if ($now->greaterThan($dueDate)) {
-                $days = abs($now->diffInDays($dueDate));
+            if ($batasWaktu->greaterThan($dueDate)) {
+                $days = abs($batasWaktu->diffInDays($dueDate));
                 return "Terlambat " . $days . " Hari";
             }
 
@@ -117,23 +123,16 @@ class Loan extends Model
                 return 'text-yellow-700 dark:text-yellow-500';
             
             case 'approve':
-                // Cek jika sudah approve tapi terlambat
-                $now = now()->startOfDay();
-                $due = \Carbon\Carbon::parse($this->due_date)->startOfDay();
-                
-                if ($now->greaterThan($due)) {
-                    return 'text-red-700 dark:text-red-500';
-                }
                 return 'text-blue-700 dark:text-blue-500';
 
             case 'reject':
                 return 'text-gray-700 dark:text-neutral-300';
 
             case 'returned':
-                $now = now()->startOfDay();
+                $compareDate = $this->return_date ?: now();
                 $due = \Carbon\Carbon::parse($this->due_date)->startOfDay();
                 
-                if ($now->greaterThan($due)) {
+                if ($compareDate->greaterThan($due)) {
                     return 'text-red-700 dark:text-red-500';
                 }
                 return 'text-green-700 dark:text-green-500';
@@ -146,7 +145,7 @@ class Loan extends Model
     public function getHariTerlambatAttribute()
     {
         // Jika belum approve atau belum jatuh tempo, maka 0 hari
-        if ($this->status !== 'approve' || now()->lessThan($this->due_date)) {
+        if ($this->status !== 'approve' && $this->status !== 'returned' || now()->lessThan($this->due_date)) {
             return 0;
         }
 

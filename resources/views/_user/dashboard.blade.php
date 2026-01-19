@@ -17,7 +17,7 @@
 
                     <div class="ms-3">
                         <h3 class="text-sm font-semibold text-red-800 dark:text-red-500">
-                            Anda Mempunyai Peminjaman Terlambat: {{ $loan->tool->name ?? 'Barang Tidak Diketahui' }} ({{ $loan->quantity }} Unit)
+                            Anda Mempunyai  Peminjaman Terlambat: {{ $loan->tool->name ?? 'Barang Tidak Diketahui' }} ({{ $loan->quantity }} Unit)
                         </h3>
                         <p class="mt-1 text-sm text-red-700 dark:text-red-400">
                             Tanggal Jatuh Tempo: <strong>{{ \Carbon\Carbon::parse($loan->due_date)->format('d M Y') }}</strong> 

@@ -15,6 +15,7 @@ class Tool extends Model
         'quantity',
         'status',
         'place_id',
+        'fine',
     ];
 
     public function category()

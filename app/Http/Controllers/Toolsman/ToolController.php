@@ -44,6 +44,7 @@ class ToolController extends Controller
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'name' => 'required',
             'quantity' => 'required|numeric',
+            'fine' => 'required|numeric',
             'place_id' => 'required',
         ]);
 
@@ -88,6 +89,7 @@ class ToolController extends Controller
             'name' => 'required',
             'quantity' => 'required|numeric',
             'place_id' => 'required',
+            'fine' => 'required|numeric'
         ]);
         
         $data['category_id'] = $category->id;
