@@ -94,12 +94,16 @@
 
                                 {{-- Status Badge --}}
                                 <div class="flex flex-col items-end gap-2 shrink-0">
-                                    @if ($loan->status === 'approve' && now()->startOfDay()->greaterThan($loan->due_date->startOfDay()))
+                                    @if ($loan->status === 'approve' || ($loan->status === 'approve' && $loan->fine_amount > 0))
                                     <span class="inline-flex items-center gap-x-1.5 py-1.5 px-3 rounded-full text-xs font-bold bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
                                         <span class="size-1.5 rounded-full bg-blue-600 "></span>
+                                        @if ($loan->status === 'approve' && $loan->fine_amount > 0)
                                         Dalam Peminjaman ({{ $loan->keterangan_status }})
+                                        @else
+                                        {{ $loan->keterangan_status }}
+                                        @endif
                                     </span>
-                                    @elseif ($loan->status === 'returned' && now()->startOfDay()->greaterThan($loan->due_date->startOfDay()))
+                                    @elseif ($loan->status === 'returned' && $loan->fine_amount > 0)
                                     <span class="inline-flex items-center gap-x-1.5 py-1.5 px-3 rounded-full text-xs font-bold bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-500">
                                         <span class="size-1.5 rounded-full bg-red-600 "></span>
                                         Dikembalikan {{ $loan->keterangan_status }}
@@ -107,6 +111,11 @@
                                     @elseif ($loan->status === 'reject')
                                     <span class="inline-flex items-center gap-x-1.5 py-1.5 px-3 rounded-full text-xs font-bold bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400">
                                         <span class="size-1.5 rounded-full bg-gray-600 "></span>
+                                        {{ $loan->keterangan_status }}
+                                    </span>
+                                    @elseif ($loan->status === 'pending')
+                                    <span class="inline-flex items-center gap-x-1.5 py-1.5 px-3 rounded-full text-xs font-bold bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">
+                                        <span class="size-1.5 rounded-full bg-yellow-600 "></span>
                                         {{ $loan->keterangan_status }}
                                     </span>
                                     @else

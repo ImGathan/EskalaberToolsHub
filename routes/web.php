@@ -2,10 +2,9 @@
 
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\PlaceController;
-use App\Http\Controllers\Admin\TaskCategoryController;
-use App\Http\Controllers\Admin\TaskController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\ToolController;
+use App\Http\Controllers\Admin\ActivityLogController;
 use App\Http\Controllers\Toolsman\UserController as ToolsmanUserController;
 use App\Http\Controllers\Toolsman\ToolController as ToolsmanToolController;
 use App\Http\Controllers\Toolsman\LoanController as ToolsmanLoanController;
@@ -68,23 +67,8 @@ Route::middleware('auth', 'role:SUPERADMIN')->prefix('admin')->name('admin.')->g
         Route::delete('/delete/{id}', [ToolController::class, 'delete'])->name('delete');
     });
 
-    Route::prefix('task-categories')->name('task_categories.')->group(function () {
-        Route::get('/', [TaskCategoryController::class, 'index'])->name('index');
-        Route::get('/add', [TaskCategoryController::class, 'add'])->name('add');
-        Route::post('/create', [TaskCategoryController::class, 'doCreate'])->name('create');
-        Route::get('/update/{id}', [TaskCategoryController::class, 'update'])->name('update');
-        Route::post('/update/{id}', [TaskCategoryController::class, 'doUpdate'])->name('doUpdate');
-        Route::delete('/delete/{id}', [TaskCategoryController::class, 'delete'])->name('delete');
-    });
-
-    Route::prefix('tasks')->name('tasks.')->group(function () {
-        Route::get('/', [TaskController::class, 'index'])->name('index');
-        Route::get('/add', [TaskController::class, 'add'])->name('add');
-        Route::post('/create', [TaskController::class, 'doCreate'])->name('do_create');
-        Route::get('/detail/{id}', [TaskController::class, 'detail'])->name('detail');
-        Route::get('/update/{id}', [TaskController::class, 'update'])->name('update');
-        Route::post('/update/{id}', [TaskController::class, 'doUpdate'])->name('do_update');
-        Route::delete('/delete/{id}', [TaskController::class, 'delete'])->name('delete');
+    Route::prefix('activity_logs')->name('activity_logs.')->group(function () {
+        Route::get('/', [ActivityLogController::class, 'index'])->name('index');
     });
 
     Route::prefix('profile')->name('profile.')->group(function () {

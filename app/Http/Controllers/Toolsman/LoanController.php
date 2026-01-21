@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Tool;
 use App\Models\Loan;
+use App\MOdels\ActivityLog;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -66,11 +67,12 @@ class LoanController extends Controller
         DB::transaction(function() use ($loan) {
             $loan->update([
                 'status'=>'approve',
-                'approve_date' => now()
+                'approval_date' => now()
             ]);
             $loan->tool->update(['quantity' => $loan->tool->quantity - $loan->quantity]);
         });
 
+        ActivityLog::record( 'Penyetujuan Pinjaman', Auth::user()->username . ' menyetujui pinjaman oleh ' . $loan->user->username . ' yaitu ' . $loan->tool->name . ' sebanyak ' . $loan->quantity . ' unit.');
 
         return back()->with('success', 'Peminjaman berhasil disetujui.');
     }
@@ -83,7 +85,7 @@ class LoanController extends Controller
             $loan->update(['status'=>'reject']);
         });
 
-
+        ActivityLog::record( 'Penolakan Pinjaman', Auth::user()->username . ' menolak pinjaman oleh ' . $loan->user->username . ' yaitu ' . $loan->tool->name . ' sebanyak ' . $loan->quantity . ' unit.');
         return back()->with('success', 'Peminjaman berhasil ditolak.');
     }
 
@@ -99,6 +101,7 @@ class LoanController extends Controller
             $loan->tool->update(['quantity' => $loan->tool->quantity + $loan->quantity]);
         });
 
+        ActivityLog::record( 'Pengembalian Pinjaman', Auth::user()->username . ' menyetujui pengembalian pinjaman oleh ' . $loan->user->username . ' yaitu ' . $loan->tool->name . ' sebanyak ' . $loan->quantity . ' unit.');
         return back()->with('success', 'Peminjaman berhasil dikembalikan.');
     }
 

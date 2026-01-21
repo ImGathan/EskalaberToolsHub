@@ -48,9 +48,19 @@ class Loan extends Model
 
             // 1. Logika Reject Otomatis
             if ($loan->status === 'pending') {
-                if ($loan->created_at->diffInHours(now()) >= 24) {
+                $now = now();
+                
+                // Perbaikan cara cek apakah hari pinjam dan kembali itu sama
+                $isSameDay = $loan->loan_date->isSameDay($loan->due_date);
+
+                // Perbaikan logika: 
+                // Bandingkan waktu sekarang ($now) dengan AKHIR HARI tanggal pinjam
+                $sudahMelewatiHariPinjam = $now->gt($loan->loan_date->endOfDay());
+                $sudahLewat24Jam = $loan->created_at->diffInHours($now) >= 24;
+
+                if (($isSameDay && $sudahMelewatiHariPinjam) || $sudahLewat24Jam) {
                     $loan->status = 'reject';
-                    $loan->information = "Ditolak otomatis karena tidak ada persetujuan dalam 24 jam.";
+                    $loan->information = "Ditolak otomatis karena tidak ada persetujuan tepat waktu.";
                     $loan->saveQuietly();
                     return;
                 }
@@ -129,7 +139,7 @@ class Loan extends Model
                 return 'text-gray-700 dark:text-neutral-300';
 
             case 'returned':
-                $compareDate = $this->return_date ?: now();
+                $compareDate = $this->return_date ? $this->return_date->startOfDay() : now()->startOfDay(); 
                 $due = \Carbon\Carbon::parse($this->due_date)->startOfDay();
                 
                 if ($compareDate->greaterThan($due)) {

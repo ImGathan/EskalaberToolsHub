@@ -39,6 +39,14 @@ use App\Constants\UserConst;
                             Dashboard
                         </a>
                     </li>
+                    <li>
+                        <a navigate
+                            class="flex items-center gap-x-3.5 py-2.5 px-3 {{ request()->routeIs('admin.activity_logs.index') ? 'bg-blue-100 text-blue-600 dark:bg-neutral-700 dark:text-blue-400' : 'text-gray-800 dark:text-white' }} text-sm rounded-lg hover:bg-gray-100 focus:outline-hidden focus:bg-gray-100 dark:hover:bg-neutral-700 dark:focus:bg-neutral-700 font-semibold"
+                            href="{{ route('admin.activity_logs.index') }}">
+                            @include('_admin._layout.icons.sidebar.dashboard')
+                            Log Aktivitas
+                        </a>
+                    </li>
 
                     <li class="hs-accordion {{ request()->routeIs('admin.users.*') || request()->routeIs('admin.task_categories.*') ? 'active' : '' }}"
                         id="projects-accordion">

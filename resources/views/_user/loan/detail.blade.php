@@ -68,11 +68,11 @@
                     </div>
 
                     @if($data->return_date)
-                    <div class="p-4 bg-green-50 rounded-xl dark:bg-green-900/10 border border-green-100 dark:border-green-900/20">
-                        <p class="text-xs text-green-600 dark:text-green-400 uppercase tracking-wide font-semibold mb-1">
+                    <div class="p-4 bg-gray-50 rounded-xl dark:bg-neutral-700/50 border border-gray-100 dark:border-neutral-700">
+                        <p class="text-xs text-gray-500 dark:text-neutral-400 uppercase tracking-wide font-semibold mb-1">
                             Tanggal Dikembalikan
                         </p>
-                        <p class="text-sm font-medium text-green-800 dark:text-green-300">
+                        <p class="text-sm font-medium text-gray-800 dark:text-neutral-200">
                             {{ \Carbon\Carbon::parse($data->return_date)->translatedFormat('d F Y') }}
                         </p>
                     </div>
@@ -100,7 +100,7 @@
             </div>
         </div>
 
-        @if($data->status === 'returned' && now()->startOfDay()->greaterThan($data->due_date->startOfDay()))
+        @if($data->status === 'returned' && $data->fine_amount > 0)
             {{-- Kolom Kanan: Ringkasan Biaya/Denda (Jika Ada) --}}
             <div class="space-y-6">
 

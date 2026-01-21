@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Loan;
 use App\Models\Tool;
+use App\Models\ActivityLog;
 use Illuminate\Support\Facades\Auth;
 
 
@@ -82,6 +83,7 @@ class LoanController extends Controller
         $data['information'] = "";
 
         Loan::create($data);
+        ActivityLog::record( 'Pengajuan Pinjaman', Auth::user()->username . ' mengajukan pinjaman alat: ' . $tool->name . ' sebanyak ' . $request->quantity . ' unit.');
         return redirect()->route('user.loans.index')->with('success', 'Loan created successfully');
     }
 
