@@ -28,7 +28,7 @@ class LoanController extends Controller
         // 1. Di tingkat Database: Urutkan loan_date DESC, lalu ID DESC
         $loans = $query->orderBy('loan_date', 'desc')
                     ->orderBy('id', 'desc')
-                    ->paginate(20);
+                    ->paginate(10);
 
         // 2. Di tingkat Collection (PHP):
         $groupedLoans = $loans->getCollection()
@@ -75,6 +75,17 @@ class LoanController extends Controller
             'quantity.min' => 'Jumlah minimal peminjaman adalah 1.'
         ]);
 
+        $existingLoan = Loan::where('tool_id', $request->tool_id)
+            ->where('user_id', Auth::id())
+            ->where('status', 'pending')
+            ->first();
+
+        if ($existingLoan) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error_duplicate', 'Anda masih memiliki pengajuan pending untuk alat ini.');
+        }
+
         $data = $request->all();
         $data['user_id']     = Auth::id();
         $data['loan_date']   = now();
@@ -92,6 +103,29 @@ class LoanController extends Controller
             ->where('user_id', Auth::id()) // Pastikan ini milik user yang login
             ->findOrFail($id);
         return view('_user.loan.detail', compact('data'));
+    }
+
+    public function update(int $id)
+    {
+        $userId = Auth::user()->id;
+        $loan = Loan::where('user_id', $userId)->findOrFail($id);
+        return view('_user.loan.update', compact('loan'));
+    }
+
+    public function doUpdate(Request $request, int $id)
+    {
+        $userId = Auth::user()->id;
+        $loan = Loan::where('user_id', $userId)->where('status', 'pending')->findOrFail($id);
+        $loan->update($request->all());
+        return redirect()->route('user.loans.index')->with('success', 'Loan updated successfully');
+    }
+
+    public function delete(int $id)
+    {
+        $userId = Auth::user()->id;
+        $loan = Loan::where('user_id', $userId)->where('status', 'pending')->findOrFail($id);
+        $loan->delete();
+        return redirect()->route('user.loans.index')->with('success', 'Loan deleted successfully');
     }
 
 }

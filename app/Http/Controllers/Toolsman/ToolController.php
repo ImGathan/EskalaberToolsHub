@@ -22,7 +22,7 @@ class ToolController extends Controller
         ->when($keywords, function ($query, $keywords) {
             return $query->where('name', 'like', '%'.$keywords.'%');
         })
-        ->get();
+        ->paginate(10);
 
         return view('_toolsman.tool.index', compact('tools', 'keywords'));
     }

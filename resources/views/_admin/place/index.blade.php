@@ -101,12 +101,10 @@
         </table>
     </div>
 
-    {{-- Pagination Section --}}
-    @if (count($places) > 0 && $places->hasPages())
-        <div class="py-4 flex justify-end">
-            {{ $places->links() }}
-        </div>
-    @endif
+</div>
+
+<div class="mt-8">
+    {{ $places->links() }}
 </div>
 
 {{-- Delete Confirmation Modal --}}

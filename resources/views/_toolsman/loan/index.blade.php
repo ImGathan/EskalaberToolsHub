@@ -19,6 +19,7 @@
     <nav class="flex space-x-2" aria-label="Tabs" role="tablist">
         <a href="{{ route('toolsman.loans.index', ['status' => 'pending']) }}"
             class="py-4 px-1 inline-flex items-center gap-x-2 border-b-2 {{ request('status', 'pending') == 'pending' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-blue-600' }} text-sm font-medium whitespace-nowrap">
+            @include('_toolsman._layout.icons.sidebar.pending_loan')
             Menunggu Persetujuan
             <span class="inline-flex items-center py-0.5 px-1.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-neutral-700 dark:text-neutral-300">
                 {{ $countPending ?? 0 }}
@@ -26,6 +27,7 @@
         </a>
         <a href="{{ route('toolsman.loans.index', ['status' => 'approve']) }}"
             class="py-4 px-1 inline-flex items-center gap-x-2 border-b-2 {{ request('status') == 'approve' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-blue-600' }} text-sm font-medium whitespace-nowrap">
+            @include('_toolsman._layout.icons.sidebar.on_loan')
             Dalam Peminjaman
             <span class="inline-flex items-center py-0.5 px-1.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-neutral-700 dark:text-neutral-300">
                 {{ $countApprove ?? 0 }}
@@ -33,6 +35,7 @@
         </a>
         <a href="{{ route('toolsman.loans.index', ['status' => 'history']) }}"
             class="py-4 px-1 inline-flex items-center gap-x-2 border-b-2 {{ request('status') == 'history' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-blue-600' }} text-sm font-medium whitespace-nowrap">
+            @include('_toolsman._layout.icons.sidebar.loan_history')
             Riwayat Peminjaman
             <!-- <span class="inline-flex items-center py-0.5 px-1.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-neutral-700 dark:text-neutral-300">
                 {{ $countReject ?? 0 }}
@@ -138,10 +141,38 @@
                                 </form>
                                 @endif
                                 {{-- Tombol Detail untuk status selain pending --}}
-                                <a href="{{ route('toolsman.loans.index', $loan->id) }}" 
-                                    class="py-1.5 px-3 inline-flex items-center gap-x-1 text-xs font-bold rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-700">
-                                    Detail
+                                <a navigate href="{{ route('toolsman.loans.index', $loan->id) }}" 
+                                    class="p-2 inline-flex items-center rounded-lg border border-gray-200 bg-white text-gray-800 hover:bg-gray-100 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300" title="View">
+                                    @include('_admin._layout.icons.view_detail')
                                 </a>
+
+                                <div class="hs-dropdown relative inline-flex">
+                                    <button id="hs-dropdown-custom-icon-trigger" type="button" class="hs-dropdown-toggle p-2 inline-flex justify-center items-center gap-2 rounded-lg border border-gray-200 bg-white text-gray-400 shadow-sm hover:bg-gray-50 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-400 dark:hover:bg-neutral-700">
+                                        <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+                                    </button>
+
+                                    <div class="hs-dropdown-menu transition-[opacity,margin] duration hs-dropdown-open:opacity-100 opacity-0 hidden min-w-60 bg-white shadow-md rounded-lg p-2 mt-2 dark:bg-neutral-800 dark:border dark:border-neutral-700 dark:divide-neutral-700 z-30" aria-labelledby="hs-dropdown-custom-icon-trigger">
+                                        
+                                        @if($loan->fine_amount > 0)
+                                        <a href="{{ route('toolsman.loans.late-report', $loan->id) }}" class="flex items-center gap-x-3 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-neutral-300" href="#">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                                            Cetak Laporan Keterlambatan (PDF)
+                                        </a>
+                                        @endif
+                                        
+                                        <form action="#" method="POST" class="inline">
+                                            @csrf
+                                            <button type="submit" class="w-full flex items-center gap-x-3 py-2 px-3 rounded-lg text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+                                                Daftar Hitamkan User
+                                            </button>
+                                        </form>
+
+                                        
+
+                                    </div>
+                                </div>
+
                             @endif
                         </div>
                     </td>
@@ -156,6 +187,10 @@
             </tbody>
         </table>
     </div>
+</div>
+
+<div class="mt-8">
+    {{ $loans->links() }}
 </div>
 
 <script>

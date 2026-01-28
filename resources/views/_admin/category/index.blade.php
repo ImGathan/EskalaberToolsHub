@@ -111,12 +111,10 @@
         </table>
     </div>
 
-    {{-- Pagination Section --}}
-    @if (count($categories) > 0 && method_exists($categories, 'links') && $categories->hasPages())
-        <div class="py-4 flex justify-end">
-            {{ $categories->links() }}
-        </div>
-    @endif
+</div>
+
+<div class="mt-8">
+    {{ $categories->links() }}
 </div>
 
 {{-- Delete Confirmation Modal --}}

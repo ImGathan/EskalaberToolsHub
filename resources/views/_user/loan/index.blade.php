@@ -65,33 +65,33 @@
             {{-- Loan Items List --}}
             <div class="grid gap-4">
                 @foreach($items as $loan)
-                <div class="group bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden dark:bg-neutral-900 dark:border-neutral-700 hover:border-blue-300 dark:hover:border-blue-900 transition-all duration-200">
-                    <div class="flex flex-col md:flex-row items-stretch">
+                <div class="group bg-white border border-gray-200 rounded-xl shadow-md hover:shadow-xl hover:shadow-blue-500/20 transition-all duration-300 dark:bg-neutral-800 dark:border-neutral-700 overflow-hidden">
+                    <div class="flex flex-col md:flex-row">
+                        
                         {{-- Image Section --}}
-                        <div class="md:w-48 shrink-0 relative overflow-hidden bg-gray-100 dark:bg-neutral-800">
-                            <img class="w-full h-40 md:h-full object-cover transition-transform duration-500 group-hover:scale-105" 
+                        <div class="md:w-56 shrink-0 relative overflow-hidden">
+                            <img class="w-full h-48 md:h-full object-cover transition-transform duration-500 group-hover:scale-105" 
                                 src="{{ $loan->tool && $loan->tool->image ? asset('storage/' . $loan->tool->image) : asset('admin/images/empty-data.webp') }}" 
                                 alt="Barang">
+                            {{-- Floating ID Badge --}}
+                            <div class="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/60 to-transparent md:hidden">
+                                <span class="text-[10px] text-white/90 font-mono">#LOAN-{{ $loan->id }}</span>
+                            </div>
                         </div>
 
                         {{-- Info Section --}}
-                        <div class="flex-1 p-4 md:p-5 flex flex-col justify-between">
-                            <div class="flex flex-col md:flex-row justify-between items-start gap-4">
+                        <div class="flex-1 p-5 md:p-6 flex flex-col">
+                            <div class="flex justify-between items-start gap-4 mb-3">
                                 <div class="space-y-1">
-                                    <span class="text-[10px] font-bold tracking-widest text-blue-600 uppercase dark:text-blue-500">
+                                    <span class="inline-flex items-center py-1 px-2 rounded-lg bg-blue-100 text-blue-700 text-[10px] font-bold uppercase tracking-wider dark:bg-blue-500/10 dark:text-blue-400">
                                         {{ $loan->tool->category->name ?? 'Kategori' }}
                                     </span>
-                                    <h3 class="text-lg font-bold text-gray-800 dark:text-neutral-200 group-hover:text-blue-600 transition-colors">
+                                    <h3 class="text-xl font-bold text-gray-800 dark:text-neutral-200 group-hover:text-blue-600 transition-colors">
                                         {{ $loan->tool->name ?? 'Barang Tidak Diketahui' }}
                                     </h3>
-                                    <div class="flex items-center gap-3 text-sm text-gray-500 dark:text-neutral-400">
-                                        <div class="flex items-center gap-1">
-                                            <svg class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
-                                            <span class="font-semibold">{{ $loan->quantity }} Unit</span>
-                                        </div>
-                                    </div>
                                 </div>
 
+                                {{-- Status Badge - SOLID (Sesuai request sebelumnya) --}}
                                 {{-- Status Badge --}}
                                 <div class="flex flex-col items-end gap-2 shrink-0">
                                     @if ($loan->status === 'approve' || ($loan->status === 'approve' && $loan->fine_amount > 0))
@@ -127,17 +127,52 @@
                                 </div>
                             </div>
 
-                            <div class="mt-4 pt-4 border-t border-gray-100 dark:border-neutral-800 flex justify-between items-center">
-                                <span class="text-xs text-gray-400 dark:text-neutral-500">
-                                    ID Peminjaman: <span class="font-mono text-gray-600 dark:text-neutral-300">#LOAN-{{ $loan->id }}</span>
-                                </span>
-                                <a navigate href="{{ route('user.loans.detail', $loan->id) }}" 
-                                    class="inline-flex items-center gap-x-2 text-sm font-semibold text-blue-600 hover:text-blue-500 dark:text-blue-500 dark:hover:text-blue-400">
-                                    Lihat Detail
-                                    <svg class="size-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
-                                    </svg>
-                                </a>
+                            {{-- Detail Info --}}
+                            <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-5">
+                                <div class="flex">
+                                    <span class="text-xs text-gray-400 dark:text-neutral-500 font-bold tracking-tight mr-2">Jumlah</span>
+                                    <span class="text-xs font-bold text-gray-700 dark:text-neutral-300">{{ $loan->quantity }} Unit</span>
+                                </div>
+                                <div class="flex">
+                                    <span class="text-xs text-gray-400 dark:text-neutral-500 font-bold tracking-tight mr-2">Lokasi</span>
+                                    <span class="text-xs font-bold text-gray-700 dark:text-neutral-300 line-clamp-1">{{ $loan->tool->place->name ?? '-' }}</span>
+                                </div>
+                                <div class="flex col-span-2 sm:col-span-1">
+                                    <span class="text-xs text-gray-400 dark:text-neutral-500 font-bold tracking-tight mr-2">ID </span>
+                                    <span class="text-xs font-mono font-bold text-blue-600 dark:text-blue-400">#L-{{ $loan->id }}</span>
+                                </div>
+                            </div>
+
+                            {{-- Footer Card --}}
+                            <div class="mt-auto pt-4 border-t border-gray-300 dark:border-neutral-700 flex justify-between items-center">
+                                <div class="flex items-center gap-2">
+                                    <div class="size-2 rounded-full bg-gray-300 dark:bg-neutral-600"></div>
+                                    <span class="text-xs text-gray-500 dark:text-neutral-400">Diajukan pada {{ $loan->created_at->format('H:i') }} WIB</span>
+                                </div>
+                                
+                                <div class="flex items-center gap-3">
+
+                                    @if ($loan->status === 'pending')
+                                    <button type="button" onclick="setDeleteData('{{ $loan->id }}', '{{ $loan->tool->name }}')"
+                                        data-hs-overlay="#delete-modal"
+                                        class="p-2 inline-flex items-center rounded-lg border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:border-red-800 dark:text-red-500 cursor-pointer" title="Delete">
+                                        @include('_admin._layout.icons.trash')
+                                    </button>
+                                    <a navigate href="{{ route('user.loans.update', $loan->id) }}" 
+                                        class="p-2 inline-flex items-center rounded-lg border border-blue-200 bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-500" title="Edit">
+                                        @include('_admin._layout.icons.pencil')
+                                    </a>
+                                    @endif
+    
+                                    <a navigate href="{{ route('user.loans.detail', $loan->id) }}" 
+                                        class="py-2 px-4 inline-flex items-center gap-x-2 text-sm font-bold rounded-xl bg-blue-600 text-white hover:bg-blue-700 shadow-md shadow-blue-500/20 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all dark:bg-blue-500 dark:hover:bg-blue-600 dark:text-neutral-900">
+                                        Lihat Detail
+                                        <svg class="size-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                                        </svg>
+                                    </a>
+                                </div>
+
                             </div>
                         </div>
                     </div>
@@ -155,9 +190,43 @@
 </div>
 
 @if(method_exists($loans, 'links'))
-<div class="mt-10">
+<div class="mt-8">
     {{ $loans->links() }}
 </div>
 @endif
 
+
+{{-- Delete Confirmation Modal --}}
+<div id="delete-modal" class="hs-overlay hidden size-full fixed top-0 start-0 z-80 overflow-x-hidden overflow-y-auto" role="dialog" tabindex="-1">
+    <div class="hs-overlay-open:mt-7 hs-overlay-open:opacity-100 hs-overlay-open:duration-500 mt-0 opacity-0 ease-out transition-all sm:max-w-lg sm:w-full m-3 sm:mx-auto">
+        <div class="relative flex flex-col bg-white border shadow-sm rounded-xl dark:bg-neutral-800 dark:border-neutral-700">
+            <div class="p-4 sm:p-10 text-center">
+                <span class="mb-4 inline-flex justify-center items-center size-14 rounded-full border-4 border-red-50 bg-red-100 text-red-500 dark:bg-red-700 dark:border-red-600 dark:text-red-100">
+                    @include('_admin._layout.icons.warning_modal')
+                </span>
+                <h3 class="mb-2 text-xl font-bold text-gray-800 dark:text-neutral-200">Hapus Peminjaman</h3>
+                <p class="text-gray-500 dark:text-neutral-500">
+                    Apakah Anda yakin ingin menghapus peminjaman <span id="delete-item-name" class="font-semibold text-gray-800 dark:text-neutral-200"></span>? 
+                    Data Peminjaman yang dihapus tidak dapat dipulihkan.
+                </p>
+
+                <div class="mt-6 flex justify-center gap-x-4">
+                    <button type="button" class="py-2 px-3 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 hover:bg-gray-50 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300" data-hs-overlay="#delete-modal">Batal</button>
+                    <form id="delete-form" method="POST" class="inline">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="py-2 px-3 text-sm font-medium rounded-lg bg-red-600 text-white hover:bg-red-700">Ya, Hapus</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function setDeleteData(id, name) {
+        document.getElementById('delete-item-name').textContent = name;
+        document.getElementById('delete-form').action = '{{ url("user/loans/delete") }}/' + id;
+    }
+</script>
 @endsection

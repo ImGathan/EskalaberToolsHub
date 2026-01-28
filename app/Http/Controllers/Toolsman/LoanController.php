@@ -9,6 +9,7 @@ use App\Models\Loan;
 use App\MOdels\ActivityLog;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class LoanController extends Controller
 {
@@ -37,7 +38,7 @@ class LoanController extends Controller
                 });
             })
             ->orderBy('loan_date', 'desc')
-            ->paginate(10);
+            ->paginate(10)->withQueryString();
 
         
 
@@ -103,6 +104,30 @@ class LoanController extends Controller
 
         ActivityLog::record( 'Pengembalian Pinjaman', Auth::user()->username . ' menyetujui pengembalian pinjaman oleh ' . $loan->user->username . ' yaitu ' . $loan->tool->name . ' sebanyak ' . $loan->quantity . ' unit.');
         return back()->with('success', 'Peminjaman berhasil dikembalikan.');
+    }
+
+
+    public function downloadLateReport($id)
+    {
+        $loan = Loan::with(['user', 'tool'])->findOrFail($id);
+
+        // Pastikan hanya bisa cetak jika terlambat
+        if ($loan->fine_amount <= 0) {
+            return back()->with('error', 'Peminjaman ini tidak memiliki riwayat keterlambatan.');
+        }
+
+        $data = [
+            'title' => 'Laporan Keterlambatan Peminjaman',
+            'date' => date('d/m/Y'),
+            'loan' => $loan
+        ];
+
+        // Load view khusus PDF dan set ukuran kertas
+        $pdf = Pdf::loadView('_toolsman.loan.keterlambatan_report', $data)
+                ->setPaper('a4', 'portrait');
+
+        // Nama file otomatis: Laporan_Terlambat_Username_Tanggal.pdf
+        return $pdf->download('Laporan_Terlambat_' . $loan->user->username . '_' . date('Ymd') . '.pdf');
     }
 
 }

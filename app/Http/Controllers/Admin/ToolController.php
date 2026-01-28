@@ -15,7 +15,7 @@ class ToolController extends Controller
         $keywords = $request->get('keywords');
         $tools = Tool::with('category.toolsman', 'place')->when($keywords, function ($query, $keywords) {
             return $query->where('name', 'like', '%'.$keywords.'%');
-        })->get();
+        })->paginate(10);
 
         return view('_admin.tool.index', compact('tools', 'keywords'));
     }

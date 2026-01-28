@@ -13,7 +13,7 @@ class PlaceController extends Controller
         $keywords = $request->get('keywords');
         $places = Place::when($keywords, function ($query, $keywords) {
             return $query->where('name', 'like', '%'.$keywords.'%');
-        })->paginate(20)->withQueryString();
+        })->paginate(10)->withQueryString();
         return view('_admin.place.index', compact('places', 'keywords'));
     }
 

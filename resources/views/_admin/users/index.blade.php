@@ -128,12 +128,6 @@
         </table>
     </div>
 
-    {{-- Pagination Section --}}
-    @if (count($data) > 0 && $data->hasPages())
-        <div class="py-4 flex justify-end">
-            {{ $data->links() }}
-        </div>
-    @endif
 </div>
 
 {{-- Delete Confirmation Modal tetep sama --}}
@@ -161,6 +155,10 @@
             </div>
         </div>
     </div>
+</div>
+
+<div class="mt-8">
+    {{ $data->links() }}
 </div>
 
 <script>

@@ -42,7 +42,7 @@ class UserController extends Controller
             })
             ->orderBy('created_at', 'desc');
 
-        $data = $query->paginate(20)->withQueryString();
+        $data = $query->paginate(10)->withQueryString();
 
         return view('_admin.users.index', [
             'data' => $data,

@@ -11,7 +11,12 @@ class ActivityLogController extends Controller
 
     public function index(Request $request)
     {
-        $activity_logs = ActivityLog::all();
+        $keywords = $request->get('keywords');
+        $activity_logs = ActivityLog::when($keywords, function($query) use ($keywords) {
+            return $query->where('description', 'like', "%{$keywords}%")
+                         ->orWhere('causer_type', 'like', "%{$keywords}%");
+        })
+        ->paginate(10);
         return view('_admin.activity_log.index', compact('activity_logs'));
     }
 

@@ -52,7 +52,7 @@
                     <label for="due_date" class="block text-sm font-medium mb-2 dark:text-white">Tanggal Pengembalian <span class="text-red-500">*</span></label>
                     <input type="date" id="due_date" name="due_date" value="{{ old('due_date') }}"
                         class="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 @error('due_date') border-red-500 @enderror"
-                        required>
+                        required min="{{ date('Y-m-d') }}">
                     <p class="text-xs text-gray-500 mt-1 italic">* Harap kembalikan barang tepat waktu untuk menghindari denda.</p>
                     @error('due_date')
                     <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
@@ -83,7 +83,7 @@
 
     {{-- Info Card (Samping) --}}
     <div class="hidden md:block">
-        <div class="p-6 bg-gradient-to-br from-blue-600 to-blue-800 rounded-2xl shadow-xl text-white">
+        <div class="p-6 bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl shadow-xl text-white">
             <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info">
                     <circle cx="12" cy="12" r="10" />
@@ -93,27 +93,77 @@
                 Aturan Peminjaman
             </h3>
             <ul class="space-y-3 text-sm text-blue-100">
-                <li class="flex gap-2"><span>•</span> Status peminjaman akan diverifikasi oleh Admin/Toolsman.</li>
-                <li class="flex gap-2"><span>•</span> Keterlambatan akan dikenakan denda otomatis sebesar Rp 5.000 / hari.</li>
+                <li class="flex gap-2"><span>•</span> Status peminjaman akan diverifikasi oleh Toolsman masing-masing barang.</li>
+                <li class="flex gap-2"><span>•</span> Keterlambatan akan dikenakan denda otomatis per item sesuai tarif denda barang per hari.</li>
                 <li class="flex gap-2"><span>•</span> Harap menjaga kondisi barang yang dipinjam.</li>
             </ul>
         </div>
     </div>
 </div>
 
-<script>
-    // Validasi sederhana agar input quantity tidak melebihi stok di client-side
-    const qtyInput = document.getElementById('quantity');
-    const maxStock = parseInt(document.getElementById('max-stock').innerText);
+<div id="duplicate-modal" class="hs-overlay hidden size-full fixed top-0 start-0 z-80 overflow-x-hidden overflow-y-auto" role="dialog" tabindex="-1">
+    <div class="hs-overlay-open:mt-7 hs-overlay-open:opacity-100 hs-overlay-open:duration-500 mt-0 opacity-0 ease-out transition-all sm:max-w-lg sm:w-full m-3 sm:mx-auto">
+        <div class="relative flex flex-col bg-white border shadow-sm rounded-xl dark:bg-neutral-800 dark:border-neutral-700">
+            <div class="p-4 sm:p-10 text-center">
+                <span class="mb-4 inline-flex justify-center items-center size-14 rounded-full border-4 border-yellow-50 bg-yellow-100 text-yellow-500 dark:bg-yellow-700 dark:border-yellow-600 dark:text-yellow-100">
+                    <svg class="shrink-0 size-5" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
+                    </svg>
+                </span>
+                <h3 class="mb-2 text-xl font-bold text-gray-800 dark:text-neutral-200">Pengajuan Ganda</h3>
+                <p class="text-gray-500 dark:text-neutral-500">
+                    Anda sudah memiliki pengajuan untuk alat <span class="font-semibold">{{ $selectedTool->name ?? 'ini' }}</span> yang sedang menunggu persetujuan (Pending).
+                    <br>Mohon tunggu persetujuan admin sebelum mengajukan alat yang sama kembali.
+                </p>
 
-    qtyInput.addEventListener('input', function() {
-        if (parseInt(this.value) > maxStock) {
-            this.value = maxStock;
-            alert('Jumlah tidak boleh melebihi stok tersedia');
-        }
-        if (parseInt(this.value) < 1) {
-            this.value = 1;
-        }
-    });
+                <div class="mt-6 flex justify-center">
+                    <button type="button" class="py-2 px-10 text-sm font-medium rounded-lg bg-yellow-600 text-white hover:bg-yellow-700" data-hs-overlay="#duplicate-modal">
+                        Mengerti
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+(function() { // Menggunakan IIFE untuk isolasi variabel agar tidak bentrok (Identifier already declared)
+    
+    // 1. Validasi Input Quantity
+    var qtyInput = document.getElementById('quantity');
+    var maxStockElement = document.getElementById('max-stock');
+
+    if (qtyInput && maxStockElement) {
+        var maxStock = parseInt(maxStockElement.innerText);
+        qtyInput.addEventListener('input', function() {
+            if (parseInt(this.value) > maxStock) {
+                this.value = maxStock;
+                alert('Jumlah tidak boleh melebihi stok tersedia');
+            }
+            if (this.value !== "" && parseInt(this.value) < 1) {
+                this.value = 1;
+            }
+        });
+    }
+
+    // 2. Logika Pemicu Modal Otomatis (Tanpa DOMContentLoaded)
+    @if(session('error_duplicate'))
+        var modalElement = document.querySelector('#duplicate-modal');
+        
+        var openDuplicateModal = function() {
+            if (window.HSOverlay) {
+                HSOverlay.open(modalElement);
+            } else if (typeof HSOverlay !== 'undefined') {
+                HSOverlay.open(modalElement);
+            } else {
+                // Jika masih gagal, coba lagi dalam 300ms
+                setTimeout(openDuplicateModal, 300);
+            }
+        };
+
+        // Eksekusi langsung
+        setTimeout(openDuplicateModal, 100);
+    @endif
+})();
 </script>
 @endsection

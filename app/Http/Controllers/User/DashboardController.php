@@ -19,7 +19,7 @@ class DashboardController extends Controller
             ->where(function ($query) {
                 $query->where('status', 'returned');
             })
-            ->where('due_date', '<', $now);
+            ->where('fine_amount', '>', 0);
 
         if ($keywords) {
             $query->whereHas('tool', function($q) use ($keywords) {

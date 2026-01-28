@@ -10,7 +10,7 @@
             Data Log Aktivitas
         </h1>
         <p class="text-md text-gray-400 dark:text-neutral-400">
-            Data log aktivitas.
+            Pantau dan telusuri jejak riwayat aktivitas seluruh pengguna dalam sistem.
         </p>
     </div>
 </div>
@@ -90,12 +90,10 @@
         </table>
     </div>
 
-    {{-- Pagination Section --}}
-    @if (isset($activity_logs) && count($activity_logs) > 0 && method_exists($activity_logs, 'links') && $activity_logs->hasPages())
-        <div class="py-4 flex justify-end">
-            {{ $activity_logs->links() }}
-        </div>
-    @endif
+</div>
+
+<div class="mt-8">
+    {{ $activity_logs->links() }}
 </div>
 
 {{-- Delete Confirmation Modal --}}
