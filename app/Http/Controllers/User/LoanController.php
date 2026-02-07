@@ -8,47 +8,62 @@ use App\Models\Loan;
 use App\Models\Tool;
 use App\Models\ActivityLog;
 use Illuminate\Support\Facades\Auth;
-
+use Illuminate\Support\Facades\DB;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\Response;
 
 class LoanController extends Controller
 {
 
-    public function index(Request $request) {
+    public function index(Request $request): View|Response {
         $keywords = $request->get('keywords');
+        $status = $request->get('status');
 
         $query = Loan::with(['tool.category'])
-            ->where('user_id', Auth::id());
+            ->where('user_id', Auth::id())
+            ->when($request->get('keywords'), function ($q, $keywords) {
+                return $q->whereHas('tool', function($toolQuery) use ($keywords) {
+                    $toolQuery->where('name', 'like', '%' . $keywords . '%');
+                });
+            })
+            ->when($request->get('status'), function ($q, $status) {
+            if ($status !== 'all') {
+                $map = ['1' => 'pending', '2' => 'approve', '3' => 'returned', '4' => 'reject'];
+                $dbStatus = $map[$status] ?? $status; 
+                return $q->where('status', $dbStatus);
+            }
+        });
 
+        // Filter Kata Kunci
         if ($keywords) {
             $query->whereHas('tool', function($q) use ($keywords) {
                 $q->where('name', 'like', '%' . $keywords . '%');
             });
         }
 
-        // 1. Di tingkat Database: Urutkan loan_date DESC, lalu ID DESC
+        // Urutkan dan Paginate
         $loans = $query->orderBy('loan_date', 'desc')
                     ->orderBy('id', 'desc')
-                    ->paginate(10);
+                    ->paginate(10)
+                    ->withQueryString(); // Penting: Agar filter tidak hilang saat ganti halaman pagination
 
-        // 2. Di tingkat Collection (PHP):
+        // Pengelompokan (Logika grouping kamu tetap sama)
         $groupedLoans = $loans->getCollection()
             ->groupBy(function($item) {
                 return \Carbon\Carbon::parse($item->loan_date)->format('Y-m-d');
             })
             ->map(function ($items) {
-                // Urutkan item di dalam grup: 
-                // Pertama berdasarkan loan_date DESC, jika sama, berdasarkan ID DESC
                 return $items->sort(function ($a, $b) {
                     if ($a->loan_date === $b->loan_date) {
-                        return $b->id <=> $a->id; // ID terbaru di atas
+                        return $b->id <=> $a->id;
                     }
-                    return $b->loan_date <=> $a->loan_date; // Tanggal terbaru di atas
+                    return $b->loan_date <=> $a->loan_date;
                 });
             })
-            ->sortKeysDesc(); // Grup tanggal terbaru tetap di paling atas
+            ->sortKeysDesc();
 
-    
-        return view('_user.loan.index', compact('loans', 'groupedLoans', 'keywords'));
+        // Kirim status ke view agar dropdown tetap terpilih (selected)
+        return view('_user.loan.index', compact('loans', 'groupedLoans', 'keywords', 'status'));
     }
     
     public function add(Request $request) {
@@ -126,6 +141,38 @@ class LoanController extends Controller
         $loan = Loan::where('user_id', $userId)->where('status', 'pending')->findOrFail($id);
         $loan->delete();
         return redirect()->route('user.loans.index')->with('success', 'Loan deleted successfully');
+    }
+
+    public function returning($id) 
+    {
+        $loan = Loan::findOrFail($id);
+
+        DB::transaction(function() use ($loan) {
+            $loan->update(['status'=>'returning']);
+        });
+
+        ActivityLog::record( 'Pengajuan Pengembalian', Auth::user()->username . ' mengajukan pengembalian alat: ' . $loan->tool->name . ' sebanyak ' . $loan->quantity . ' unit.');
+        return back()->with('success', 'Pengajuan pengembalian berhasil dikirim.');
+    }
+
+    public function scan()
+    {
+        return view('_user.loan.scan');
+    }
+
+    public function addLoan(Request $request)
+    {
+        $toolId = $request->query('tool_id');
+        $tool = Tool::findOrFail($toolId);
+
+        // Cek apakah barang tersedia
+        if ($tool->status !== 'available') {
+            return redirect()->route('user.dashboard')
+                ->with('error', 'Maaf, barang ini sedang dipinjam atau tidak tersedia.');
+        }
+
+        // Tampilkan form peminjaman dengan data barang yang sudah otomatis terisi
+        return view('_user.loan.add', compact('tool'));
     }
 
 }

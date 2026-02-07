@@ -3,6 +3,7 @@
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\PlaceController;
+use App\Http\Controllers\Admin\TypeController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\ToolController;
 use App\Http\Controllers\Admin\ActivityLogController;
@@ -10,6 +11,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Toolsman\UserController as ToolsmanUserController;
 use App\Http\Controllers\Toolsman\ToolController as ToolsmanToolController;
 use App\Http\Controllers\Toolsman\LoanController as ToolsmanLoanController;
+use App\Http\Controllers\Toolsman\FineController as ToolsmanFineController;
 use App\Http\Controllers\Toolsman\DashboardController as ToolsmanDashboardController;
 use App\Http\Controllers\User\UserController as UserUserController;
 use App\Http\Controllers\User\ToolController as UserToolController;
@@ -48,6 +50,15 @@ Route::middleware('auth', 'role:SUPERADMIN')->prefix('admin')->name('admin.')->g
         Route::delete('/delete/{id}', [PlaceController::class, 'delete'])->name('delete');
     });
 
+    Route::prefix('types')->name('types.')->group(function () {
+        Route::get('/', [TypeController::class, 'index'])->name('index');
+        Route::get('/add', [TypeController::class, 'add'])->name('add');
+        Route::post('/create', [TypeController::class, 'doCreate'])->name('create');
+        Route::get('/update/{id}', [TypeController::class, 'update'])->name('update');
+        Route::post('/update/{id}', [TypeController::class, 'doUpdate'])->name('doUpdate');
+        Route::delete('/delete/{id}', [TypeController::class, 'delete'])->name('delete');
+    });
+
     Route::prefix('categories')->name('categories.')->group(function () {
         Route::get('/', [CategoryController::class, 'index'])->name('index');
         Route::get('/add', [CategoryController::class, 'add'])->name('add');
@@ -64,6 +75,7 @@ Route::middleware('auth', 'role:SUPERADMIN')->prefix('admin')->name('admin.')->g
         Route::get('/update/{id}', [ToolController::class, 'update'])->name('update');
         Route::post('/update/{id}', [ToolController::class, 'doUpdate'])->name('doUpdate');
         Route::delete('/delete/{id}', [ToolController::class, 'delete'])->name('delete');
+        Route::get('/{id}/generate-qr', [ToolController::class, 'generateQR'])->name('generate-qr');
     });
 
     Route::prefix('activity_logs')->name('activity_logs.')->group(function () {
@@ -96,6 +108,12 @@ Route::middleware('auth', 'role:TOOLSMAN')->prefix('toolsman')->name('toolsman.'
         Route::get('/{id}/late-report', [ToolsmanLoanController::class, 'downloadLateReport'])->name('late-report');
     });
 
+    Route::prefix('fines')->name('fines.')->group(function () {
+        Route::get('/', [ToolsmanFineController::class, 'index'])->name('index');
+        Route::get('/pay/{id}', [ToolsmanFineController::class, 'pay'])->name('pay');
+        Route::patch('/paid/{id}', [ToolsmanFineController::class, 'paid'])->name('paid');
+    });
+
     Route::prefix('profile')->name('profile.')->group(function () {
         Route::get('/change-password', [ToolsmanUserController::class, 'changePassword'])->name('change_password');
         Route::post('/change-password', [ToolsmanUserController::class, 'doChangePassword'])->name('do_change_password');
@@ -123,5 +141,7 @@ Route::middleware('auth', 'role:USER')->prefix('user')->name('user.')->group(fun
         Route::get('/update/{id}', [UserLoanController::class, 'update'])->name('update');
         Route::post('/update/{id}', [UserLoanController::class, 'doUpdate'])->name('do_update');
         Route::delete('/delete/{id}', [UserLoanController::class, 'delete'])->name('delete');
+        Route::patch('/{id}/returning', [UserLoanController::class, 'returning'])->name('returning');
+        Route::get('/scan', [UserLoanController::class, 'scan'])->name('scan');
     });
 });

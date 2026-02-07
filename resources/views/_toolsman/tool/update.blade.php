@@ -26,7 +26,7 @@
             method="POST" enctype="multipart/form-data">
             @csrf
 
-            <div>
+            <div class="mb-4">
                 <label for="image" class="block text-sm font-medium mb-2 dark:text-white">Gambar Barang (Opsional)</label>
                 
                 <label for="image" class="group mt-1 flex flex-col justify-center items-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:bg-gray-50 dark:hover:bg-neutral-800 hover:border-blue-400 transition-all cursor-pointer relative">
@@ -60,7 +60,7 @@
             </div>
 
             {{-- Name --}}
-            <div>
+            <div class="mb-4">
                 <label for="name" class="block text-sm font-medium mb-2 dark:text-white">Nama Barang <span
                         class="text-red-500">*</span></label>
                 <input type="text" id="name" name="name" value="{{ $tool->name }}"
@@ -72,7 +72,7 @@
             </div>
 
             {{-- Quantity --}}
-            <div>
+            <div class="mb-4">
                 <label for="quantity" class="block text-sm font-medium mb-2 dark:text-white">Jumlah <span
                         class="text-red-500">*</span></label>
                 <input type="number" id="quantity" name="quantity" value="{{ $tool->quantity }}"
@@ -84,7 +84,7 @@
             </div>
 
             {{-- Category --}}
-            <div>
+            <div class="mb-4">
                 <label for="category_id" class="block text-sm font-medium mb-2 dark:text-white">Kategori <span
                         class="text-red-500">*</span></label>
                 <input type="text" id="category_id" name="category_id" value="{{ $tool->category->name }}"
@@ -95,7 +95,26 @@
                 @enderror
             </div>
 
-            <div>
+            <div class="mb-4">
+                <label for="type_id" class="block text-sm font-medium mb-2 dark:text-white">Jenis Barang <span
+                        class="text-red-500">*</span></label>
+                <select id="type_id" name="type_id"
+                    class="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600 @error('type_id') border-red-500 focus:border-red-500 focus:ring-red-500 @enderror"
+                    required>
+                    <option value="">-- Pilih Jenis Barang --</option>
+                    @foreach ($types as $type)
+                    <option value="{{ $type->id }}"
+                        {{ $tool->type_id == $type->id ? 'selected' : '' }}>
+                        {{ $type->name }}
+                    </option>
+                    @endforeach
+                </select>
+                @error('type_id')
+                <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div class="mb-4">
                 <label for="place_id" class="block text-sm font-medium mb-2 dark:text-white">Lokasi Barang <span
                         class="text-red-500">*</span></label>
                 <select id="place_id" name="place_id"
@@ -114,7 +133,7 @@
                 @enderror
             </div>
 
-            <div>
+            <div class="mb-4">
                 <label for="quantity" class="block text-sm font-medium mb-2 dark:text-white">Harga Denda Keterlambatan<span
                         class="text-red-500">*</span></label>
                 <input type="number" id="fine" name="fine" value="{{ $tool->fine }}"

@@ -12,15 +12,18 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('tools', function (Blueprint $table) {
-            $table->foreignId('category_id')->nullable()->constrained('categories')->onDelete('restrict');
+            $table->foreignId('type_id')->nullable()->constrained('types')->onDelete('restrict');
         });
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
         Schema::table('tools', function (Blueprint $table) {
-            $table->dropForeign(['category_id']);
-            $table->dropColumn('category_id');
+            $table->dropForeign(['type_id']);
+            $table->dropColumn('type_id');
         });
     }
 };

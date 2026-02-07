@@ -6,7 +6,7 @@
 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
     <div class="bg-white overflow-hidden shadow-md shadow-indigo-500/10 rounded-2xl dark:bg-neutral-800 border border-gray-100 dark:border-neutral-700">
         <div class="px-6 py-4 border-b border-gray-200 dark:border-neutral-700 flex items-center">
-            <a href="{{ route('user.tools.index') }}"
+            <a href="{{ url()->previous() }}"
                 class="py-3 px-3 inline-flex items-center gap-x-2 text-xl rounded-xl border border-gray-200 bg-white text-gray-800 shadow-md hover:bg-gray-50 dark:bg-neutral-800 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-700 cursor-pointer">
                 <svg class="shrink-0 size-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="m12 19-7-7 7-7" />
@@ -53,7 +53,7 @@
                     <input type="date" id="due_date" name="due_date" value="{{ old('due_date') }}"
                         class="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 @error('due_date') border-red-500 @enderror"
                         required min="{{ date('Y-m-d') }}">
-                    <p class="text-xs text-gray-500 mt-1 italic">* Harap kembalikan barang tepat waktu untuk menghindari denda.</p>
+                    <p class="text-xs text-gray-500 mt-1 italic">* Denda keterlambatan Rp{{ number_format($selectedTool->fine, 0, ',', '.') }}/hari untuk setiap item.</p>
                     @error('due_date')
                     <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                     @enderror

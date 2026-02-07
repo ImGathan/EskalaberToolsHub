@@ -61,25 +61,22 @@
     <!-- Navbar -->
     <nav class="fixed w-full z-50 top-0 start-0 border-b border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-neutral-800 backdrop-blur-md transition-colors duration-300">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <!-- Logo -->
+            <div class="flex justify-between items-center h-16 relative">
+                
                 <div class="flex-shrink-0 flex items-center">
                     <a href="{{ url('/') }}" class="flex items-center gap-2">
                         @include('_admin._layout.icons.sidebar.logo')
                     </a>
                 </div>
 
-                <!-- Center Menu (Hidden on mobile) -->
-                <div class="hidden md:flex space-x-8 items-center justify-center absolute left-1/2 transform -translate-x-1/2">
+                <div class="hidden lg:flex space-x-8 items-center justify-center absolute left-1/2 transform -translate-x-1/2">
                     <a href="#hero" class="nav-link text-gray-600 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 font-medium transition-colors">Beranda</a>
                     <a href="#about" class="nav-link text-gray-600 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 font-medium transition-colors">Tentang Kami</a>
                     <a href="#loan" class="nav-link text-gray-600 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 font-medium transition-colors">Peminjaman</a>
                     <a href="#faq" class="nav-link text-gray-600 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 font-medium transition-colors">FAQ</a>
                 </div>
 
-                <!-- Right Side Actions -->
-                <div class="flex items-center gap-4">
-                    <!-- Dark Mode Toggle -->
+                <div class="flex items-center gap-2 sm:gap-4">
                     <button id="theme-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5 transition-colors">
                         <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                             <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
@@ -89,43 +86,63 @@
                         </svg>
                     </button>
 
-                    @auth
-                    <a href="{{ route('login') }}" class="text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800 transition-colors shadow-lg shadow-blue-500/30">
-                        Dashboard
-                    </a>
-                    @else
-                    <a href="{{ route('login') }}" class="text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800 transition-colors shadow-lg shadow-blue-500/30 flex gap-2 items-center">
-                        @include('_admin._layout.icons.sidebar.user')
-                        Login
-                    </a>
-                    @endauth
-                </div>
+                    <div class="hidden sm:block">
+                        @auth
+                        <a href="{{ route('login') }}" class="text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 transition-colors shadow-lg shadow-blue-500/30">
+                            Dashboard
+                        </a>
+                        @else
+                        <a href="{{ route('login') }}" class="text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 transition-colors shadow-lg shadow-blue-500/30 flex gap-2 items-center">
+                            @include('_admin._layout.icons.sidebar.user')
+                            Login
+                        </a>
+                        @endauth
+                    </div>
 
-                <!-- Mobile menu button -->
-                <div class="md:hidden flex items-center">
-                    <button type="button" class="mobile-menu-button inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500" aria-controls="mobile-menu" aria-expanded="false">
-                        <span class="sr-only">Open main menu</span>
-                        <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                        </svg>
-                    </button>
+                    <div class="lg:hidden flex items-center">
+                        <button type="button" class="mobile-menu-button inline-flex items-center justify-center p-2 rounded-md text-gray-500 hover:text-blue-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-blue-400 dark:hover:bg-gray-800 focus:outline-none transition-colors">
+                            <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Mobile Menu -->
-        <div class="md:hidden hidden" id="mobile-menu">
-            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
-                <a href="#hero" class="nav-link block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-800">Beranda</a>
-                <a href="#about" class="nav-link block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-800">Tentang Kami</a>
-                <a href="#loan" class="nav-link block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-800">Peminjaman</a>
-                <a href="#faq" class="nav-link block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-800">FAQ</a>
+        <div class="hidden lg:hidden overflow-hidden transition-all duration-300" id="mobile-menu">
+            <div class="px-4 pt-4 pb-8 bg-transparent backdrop-blur-md border-b border-gray-200/20 dark:border-gray-700/50 shadow-xl">
+                <div class="flex flex-col items-center justify-center">
+                    
+                    <a href="#hero" class="w-full text-center py-3 text-lg font-semibold text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                        Beranda
+                    </a>
+
+                    <a href="#about" class="w-full text-center py-3 text-lg font-semibold text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                        Tentang Kami
+                    </a>
+
+                    <a href="#loan" class="w-full text-center py-3 text-lg font-semibold text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                        Peminjaman
+                    </a>
+
+                    <a href="#faq" class="w-full text-center py-3 text-lg font-semibold text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                        FAQ
+                    </a>
+
+                    <div class="w-full flex items-center justify-center pt-4">
+                        <a href="{{ route('login') }}" class="block w-full md:w-1/2 text-center py-4 bg-blue-600 text-white font-bold rounded-2xl shadow-lg shadow-blue-500/30 active:scale-95 transition-transform">
+                            Masuk Ke Akun
+                        </a>
+                    </div>
+                    
+                </div>
             </div>
         </div>
     </nav>
 
     <!-- Hero Section -->
-    <section id="hero" class="relative flex flex-col items-center justify-center pt-24 pb-16 sm:pt-32 sm:pb-24 overflow-hidden bg-white dark:bg-neutral-800 transition-colors duration-300">
+    <section id="hero" class="relative flex flex-col items-center justify-center pt-28 md:pt-24 pb-12 md:pb-16 overflow-hidden bg-white dark:bg-neutral-800 transition-colors duration-300">
         <div class="absolute inset-0 -z-0 overflow-hidden pointer-events-none">
             <div class="absolute -top-40 -right-40 w-96 h-96 bg-blue-400/30 rounded-full blur-3xl dark:bg-blue-600/25"></div>
             <div class="absolute top-40 -left-20 w-72 h-72 bg-indigo-400/30 rounded-full blur-3xl dark:bg-indigo-600/25"></div>
@@ -140,26 +157,26 @@
             </svg>
         </div>
 
-        <div class="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-white/100 to-transparent dark:from-neutral-800 dark:to-transparent z-20 transition-colors duration-300"></div>
+        <div class="hidden lg:block absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-white/100 to-transparent dark:from-neutral-800 dark:to-transparent z-20 transition-colors duration-300"></div>
 
-        <div class="flex justify-center items-center relative mx-auto px-4 sm:px-6 lg:px-8 gap-12">
+        <div class="flex flex-col-reverse lg:flex-row justify-center items-center relative mx-auto px-4 sm:px-6 lg:px-8 gap-12">
 
-            <div class="relative max-w-7xl flex flex-col items-start text-left z-10">
-    
-                <div class="inline-flex items-center px-3 py-1 rounded-full border border-blue-200 bg-blue-50 text-blue-600 text-sm font-medium mb-6 dark:bg-blue-900/30 dark:border-blue-800 dark:text-blue-300">
+            <div class="relative max-w-7xl flex flex-col items-center lg:items-start text-center lg:text-left z-10 order-2 lg:order-1">
+
+                <div class="hidden md:inline-flex items-center px-3 py-1 rounded-full border border-blue-200 bg-blue-50 text-blue-600 text-sm font-medium mb-6 dark:bg-blue-900/30 dark:border-blue-800 dark:text-blue-300">
                     <span class="flex h-2 w-2 rounded-full bg-blue-600 mr-2"></span>
                     Sarana Peminjaman Barang SMKN 8 Jember
                 </div>
-    
-                <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.1] text-gray-900 dark:text-white mb-2">
+
+                <h1 class="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.1] text-gray-900 dark:text-white mb-2">
                     Kelola Peminjaman <br class="hidden sm:block" />
                     <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-blue-500 dark:from-blue-500 dark:to-blue-400">Lebih Efisien</span>
                 </h1>
-    
-                <p class="mt-4 text-xl text-gray-600 dark:text-gray-300 max-w-2xl mb-6">
+
+                <p class="mt-4 text-md md:text-lg text-gray-600 dark:text-gray-300 max-w-2xl mb-6">
                     Solusi digital untuk memantau stok, mengajukan peminjaman, dan mengembalikan barang secara terorganisir. Semua tercatat otomatis dalam satu sistem.
                 </p>
-    
+
                 <div class="flex flex-col sm:flex-row gap-4 justify-center">
                     @auth
                     <a href="{{ route('login') }}" class="inline-flex justify-center items-center py-3 px-8 text-base font-medium text-white rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 hover:bg-blue-700 shadow-xl shadow-blue-500/30 transition-all hover:scale-105">
@@ -176,34 +193,34 @@
                 </div>
             </div>
             
-            <div class="flex justify-center items-center w-1/3 h-full relative">
-                <img src="{{ asset('admin/images/hero-img.webp') }}" alt="" class="scale-150 z-10">
-                <div class="absolute w-[400px] h-[400px] bg-gradient-to-tr from-blue-500/50 to-blue-600/60 dark:from-blue-400/50 dark:to-blue-500/60 rounded-full"></div>
+            <div class="hidden lg:flex justify-center items-center w-full lg:w-1/3 h-full relative order-1 lg:order-2 mt-6">
+                <img src="{{ asset('admin/images/hero-img.webp') }}" alt="" class="scale-100 lg:scale-150 z-10 transition-transform duration-300">
+                <div class="absolute w-64 h-64 lg:w-[400px] lg:h-[400px] bg-gradient-to-tr from-blue-500/50 to-blue-600/60 dark:from-blue-400/50 dark:to-blue-500/60 rounded-full"></div>
             </div>
 
         </div>
     </section>
 
     <!-- Feature Section (Placeholder) -->
-    <section id="about" class="py-16 flex flex-col items-center justify-center bg-white dark:bg-neutral-800 transition-colors duration-300">
+    <section id="about" class="md:py-16 flex flex-col items-center justify-center bg-white dark:bg-neutral-800 transition-colors duration-300">
         <div class="max-w-7xl px-4 sm:px-6 lg:px-16">
 
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-8 mb-20">
                 <div class="text-center p-6 rounded-3xl bg-gray-50 dark:bg-neutral-900/50 border border-gray-100 dark:border-neutral-700 shadow-lg group hover:border-blue-500 group hover:shadow-blue-500/30 transition-colors">
                     <p class="text-4xl font-black text-blue-600 mb-2">{{ $totalBarang }}</p>
-                    <p class="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">Total Barang</p>
+                    <p class="text-xs md:text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">Total Barang</p>
                 </div>
                 <div class="text-center p-6 rounded-3xl bg-gray-50 dark:bg-neutral-900/50 border border-gray-100 dark:border-neutral-700 shadow-lg group hover:border-blue-500 group hover:shadow-blue-500/30 transition-colors">
                     <p class="text-4xl font-black text-blue-600 mb-2">{{ $totalPeminjaman }}</p>
-                    <p class="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">Peminjaman</p>
+                    <p class="text-xs md:text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">Peminjaman</p>
                 </div>
                 <div class="text-center p-6 rounded-3xl bg-gray-50 dark:bg-neutral-900/50 border border-gray-100 dark:border-neutral-700 shadow-lg group hover:border-blue-500 group hover:shadow-blue-500/30 transition-colors">
                     <p class="text-4xl font-black text-blue-600 mb-2">{{ $totalKategori }}</p>
-                    <p class="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">Kategori</p>
+                    <p class="text-xs md:text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">Kategori</p>
                 </div>
                 <div class="text-center p-6 rounded-3xl bg-gray-50 dark:bg-neutral-900/50 border border-gray-100 dark:border-neutral-700 shadow-lg group hover:border-blue-500 group hover:shadow-blue-500/30 transition-colors">
                     <p class="text-4xl font-black text-blue-600 mb-2">100%</p>
-                    <p class="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">Transparan</p>
+                    <p class="text-xs md:text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">Transparan</p>
                 </div>
             </div>
 
@@ -212,12 +229,12 @@
                 <p class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 dark:text-white sm:text-4xl">
                     Mengapa Harus ToolsHub?
                 </p>
-                <p class="mt-4 max-w-2xl text-xl text-gray-500 dark:text-gray-400 mx-auto">
+                <p class="mt-4 max-w-2xl text-md md:text-xl text-gray-500 dark:text-gray-400 mx-auto">
                     ToolsHub adalah ekosistem digital yang dirancang untuk efisiensi manajemen peminjaman barang SMKN 8 Jember secara menyeluruh dan transparan.
                 </p>
             </div>
 
-            <div class="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3">
+            <div class="grid grid-cols-1 gap-10 sm:grid-cols-1 lg:grid-cols-3">
                 <div class="group relative pt-6">
                     <div class="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-indigo-400 rounded-2xl opacity-20 group-hover:opacity-100 transition duration-300 blur"></div>
                     
@@ -235,7 +252,7 @@
                         <h3 class="mt-8 text-xl font-bold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                             Penjaga Amanah Aset
                         </h3>
-                        <p class="mt-4 text-gray-500 dark:text-gray-400 leading-relaxed text-center">
+                        <p class="mt-4 text-sm md:text-md text-gray-500 dark:text-gray-400 leading-relaxed text-center">
                             Kami bertanggung jawab penuh dalam mencatat dan memelihara seluruh aset SMKN 8 Jember. Dari peralatan teknologi hingga fasilitas belajar, kami memastikan setiap inventaris terjaga rapi untuk mendukung kualitas pendidikan.
                         </p>
 
@@ -259,7 +276,7 @@
                         <h3 class="mt-8 text-xl font-bold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                             Layanan Tanpa Batas
                         </h3>
-                        <p class="mt-4 text-gray-500 dark:text-gray-400 leading-relaxed text-center">
+                        <p class="mt-4 text-sm md:text-md text-gray-500 dark:text-gray-400 leading-relaxed text-center">
                             Kami hadir untuk mempermudah akses bagi seluruh warga sekolah. Dengan sistem yang transparan, peminjaman peralatan untuk kebutuhan kelas, praktik, maupun kegiatan sekolah lainnya kini menjadi lebih cepat dan efisien.
                         </p>
                     </div>
@@ -282,7 +299,7 @@
                         <h3 class="mt-8 text-xl font-bold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                             Standar Budaya Kerja
                         </h3>
-                        <p class="mt-4 text-gray-500 dark:text-gray-400 leading-relaxed text-center">
+                        <p class="mt-4 text-sm md:text-md text-gray-500 dark:text-gray-400 leading-relaxed text-center">
                             Manajemen kami mengadopsi standar kedisiplinan industri. Kami mengajak siswa untuk belajar bertanggung jawab dalam penggunaan alat, membentuk karakter yang jujur dan tertib dalam mengelola fasilitas bersama.
                         </p>
                     </div>
@@ -292,29 +309,26 @@
     </section>
 
 
-    <section id="loan" class="pt-12 pb-24 bg-white flex flex-col items-center justify-center  dark:bg-neutral-800 transition-colors duration-300 overflow-hidden">
+    <section id="loan" class="pt-12 pb-24 bg-white flex flex-col items-center justify-center dark:bg-neutral-800 transition-colors duration-300 overflow-x-hidden">
 
-        <div class="max-w-7xl sm:px-6 lg:px-16">
+        <div class="max-w-7xl w-full px-4 sm:px-6 lg:px-16">
             
             <div class="text-center mb-12">
                 <h2 class="text-base font-semibold text-blue-600 tracking-wide uppercase">Alur Sistem</h2>
-                <p class="mt-2 text-4xl font-extrabold text-gray-900 dark:text-white">
+                <p class="mt-2 text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-white leading-tight">
                     Proses Peminjaman <span class="text-blue-600">Tanpa Ribet</span>
                 </p>
-                <p class="mt-4 max-w-2xl text-xl text-gray-500 dark:text-gray-400 mx-auto">
+                <p class="mt-4 max-w-2xl text-md md:text-lg sm:text-xl text-gray-500 dark:text-gray-400 mx-auto">
                     Dirancang untuk memudahkan koordinasi antara siswa, guru, dan tim manajemen aset sekolah.
                 </p>
             </div>
 
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
 
-            <div class="grid lg:grid-cols-2 gap-16 items-center mb-0">
-
-                <div class="relative scale-90 sm:scale-100 min-h-[500px] flex items-center justify-center">
+                <div class="relative sm:scale-100 lg:scale-100 min-h-[450px] flex items-center justify-center order-2 lg:order-1">
                     <div class="absolute inset-0 bg-blue-500/5 rounded-full blur-[100px]"></div>
 
-
-                    <div class="relative w-full max-w-[500px] bg-white dark:bg-neutral-800 rounded-3xl shadow-2xl dark:shadow-blue-500/20 border border-gray-200 dark:border-neutral-700 overflow-hidden">
-                        
+                    <div class="relative w-full max-w-[450px] sm:max-w-[500px] bg-white dark:bg-neutral-800 rounded-3xl shadow-2xl border border-gray-200 dark:border-neutral-700 overflow-hidden">
                         <div class="bg-gray-50 dark:bg-neutral-900/50 border-b border-gray-200 dark:border-neutral-700 p-3 flex items-center gap-2">
                             <div class="flex gap-1.5">
                                 <div class="w-2.5 h-2.5 rounded-full bg-red-400"></div>
@@ -325,7 +339,6 @@
                         </div>
 
                         <div class="relative h-[380px] overflow-hidden">
-                            
                             <div class="absolute inset-0 p-4 transition-opacity duration-300 animate-[page-list_12s_infinite]">
                                 <div class="bg-gray-200 w-fit dark:bg-neutral-700 rounded-lg mb-4 flex items-center font-semibold text-xs text-gray-400 px-4 gap-2">
                                     @include('_admin._layout.icons.search')
@@ -338,7 +351,7 @@
                                         </div>
                                         <p class="h-2 w-full text-gray-400 dark:text-neutral-500 rounded text-sm font-semibold py-2">Laptop</p>
                                         <div class="flex items-center justify-center bg-blue-600 rounded mt-6">
-                                            <p class="text-white text-xs p-2 font-semibold">Ajukan Peminjaman</p>
+                                            <p class="text-white text-xs p-2 font-semibold">Ajukan Pinjam</p>
                                         </div>
                                     </div>
                                     <div class="bg-white dark:bg-neutral-800 border-2 border-gray-100 dark:border-neutral-700 rounded-xl p-2 shadow-sm">
@@ -363,7 +376,6 @@
                                         </div>
                                         <div class="flex items-center">
                                             <p class="text-blue-500 dark:text-blue-400 font-semibold">Laptop</p>
-                                            <!-- <p class="text-blue-400 dark:text-blue-300 font-semibold text-xs">Kategori : RPL</p> -->
                                         </div>
                                     </div>
                                     <div class="space-y-1">
@@ -384,12 +396,12 @@
                                 </div>
                             </div>
 
-                            <div class="absolute inset-x-0 top-6 flex justify-center z-50 pointer-events-none">
+                            <div class="absolute inset-x-0 top-6 flex justify-center z-50 pointer-events-none px-4">
                                 <div class="bg-emerald-500 text-white p-3 rounded-xl shadow-lg flex items-center gap-2 opacity-0 animate-[notif-pop_12s_infinite] border border-emerald-400">
                                     <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                                     </svg>
-                                    <span class="text-[11px] font-bold uppercase tracking-wider whitespace-nowrap">Pengajuan Berhasil!</span>
+                                    <span class="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider whitespace-nowrap">Pengajuan Berhasil!</span>
                                 </div>
                             </div>
 
@@ -402,19 +414,13 @@
                     </div>
                 </div>
 
-                <style>
-                    
-                    
-                </style>
-
-
-                <div class="space-y-12">
-                    <div class="relative pl-8 border-l-2 border-dashed border-gray-200 dark:border-neutral-700 space-y-12">
+                <div class="space-y-12 order-1 lg:order-2">
+                    <div class="relative ml-8 lg:ml-0 pl-8 border-l-2 border-dashed border-gray-200 dark:border-neutral-700 space-y-10 sm:space-y-12">
                         
                         <div class="relative group">
-                            <div class="absolute -left-[41px] top-0 w-5 h-5 rounded-full bg-white dark:bg-neutral-800 border-4 border-blue-600 z-10 group-hover:scale-150 transition-transform"></div>
+                            <div class="absolute -left-[41px] top-0 w-5 h-5 rounded-full bg-white dark:bg-neutral-800 border-4 border-blue-600 z-10 transition-transform lg:group-hover:scale-150"></div>
                             <div>
-                                <h4 class="text-xl font-bold text-gray-900 dark:text-white mb-2 flex items-center gap-3">
+                                <h4 class="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-2 flex items-center gap-3">
                                     <span class="text-blue-600">01.</span> Cari & Pilih Barang
                                 </h4>
                                 <p class="text-gray-500 dark:text-gray-400 leading-relaxed text-sm">Jelajahi ribuan katalog barang sekolah. Cek ketersediaan stok secara real-time dari mana saja.</p>
@@ -422,9 +428,9 @@
                         </div>
 
                         <div class="relative group">
-                            <div class="absolute -left-[41px] top-0 w-5 h-5 rounded-full bg-white dark:bg-neutral-800 border-4 border-blue-600 z-10 group-hover:scale-150 transition-transform"></div>
+                            <div class="absolute -left-[41px] top-0 w-5 h-5 rounded-full bg-white dark:bg-neutral-800 border-4 border-blue-600 z-10 transition-transform lg:group-hover:scale-150"></div>
                             <div>
-                                <h4 class="text-xl font-bold text-gray-900 dark:text-white mb-2 flex items-center gap-3">
+                                <h4 class="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-2 flex items-center gap-3">
                                     <span class="text-blue-600">02.</span> Ajukan Request
                                 </h4>
                                 <p class="text-gray-500 dark:text-gray-400 leading-relaxed text-sm">Isi formulir peminjaman digital. Sistem akan otomatis mengirimkan notifikasi ke admin untuk persetujuan.</p>
@@ -432,9 +438,9 @@
                         </div>
 
                         <div class="relative group">
-                            <div class="absolute -left-[41px] top-0 w-5 h-5 rounded-full bg-white dark:bg-neutral-800 border-4 border-blue-600 z-10 group-hover:scale-150 transition-transform"></div>
+                            <div class="absolute -left-[41px] top-0 w-5 h-5 rounded-full bg-white dark:bg-neutral-800 border-4 border-blue-600 z-10 transition-transform lg:group-hover:scale-150"></div>
                             <div>
-                                <h4 class="text-xl font-bold text-gray-900 dark:text-white mb-2 flex items-center gap-3">
+                                <h4 class="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-2 flex items-center gap-3">
                                     <span class="text-blue-600">03.</span> Ambil & Gunakan
                                 </h4>
                                 <p class="text-gray-500 dark:text-gray-400 leading-relaxed text-sm">Setelah disetujui, ambil barang di ruang aset dengan scan QR Code sebagai verifikasi keamanan.</p>
@@ -445,26 +451,22 @@
                 </div>
             </div>
 
-            <div class="mt-14 px-4">
-                <div class="text-center mb-10">
-                    <p class="text-sm font-semibold text-gray-400 uppercase tracking-widest">Jelajahi Berbagai Barang di SMKN 8 Jember</p>
+            <div class="mt-14 md:mt-18 lg:mt-20">
+                <div class="text-center mb-4 md:mb-10">
+                    <p class="text-xs md:text-sm font-semibold text-gray-400 uppercase tracking-widest px-4">Jelajahi Berbagai Barang di <br class="md:hidden"> SMKN 8 Jember</p>
                 </div>
 
-                <div class="swiper mySwiper">
+                <div class="swiper mySwiper !overflow-visible">
                     <div class="swiper-wrapper">
                         @foreach ($tools as $tool)
-                        <div class="swiper-slide w-72 h-[450px] py-10"> {{-- Card lebih tinggi --}}
-                            <div class="group relative h-full w-full bg-white dark:bg-neutral-800 rounded-3xl shadow-2xl transition-all duration-500 hover:scale-105 hover:-translate-y-4 overflow-hidden border border-gray-100 dark:border-neutral-700">
+                        <div class="swiper-slide w-[280px] sm:w-72 h-[450px] py-10">
+                            <div class="group relative h-full w-full bg-white dark:bg-neutral-800 rounded-3xl shadow-xl transition-all duration-500 lg:hover:scale-105 lg:hover:-translate-y-4 overflow-hidden border border-gray-100 dark:border-neutral-700">
                                 
                                 <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-blue-500/10 rounded-full blur-2xl group-hover:bg-blue-500/20 transition-all"></div>
-                                <div class="absolute bottom-0 left-0 mb-10 ml-4 opacity-20 group-hover:opacity-40 transition-all">
-                                    <svg width="60" height="60" viewBox="0 0 20 20" fill="currentColor" class="text-blue-600"><circle cx="2" cy="2" r="1"/><circle cx="10" cy="2" r="1"/><circle cx="18" cy="2" r="1"/><circle cx="2" cy="10" r="1"/><circle cx="10" cy="10" r="1"/><circle cx="18" cy="10" r="1"/><circle cx="2" cy="18" r="1"/><circle cx="10" cy="18" r="1"/><circle cx="18" cy="18" r="1"/></svg>
-                                </div>
-
+                                
                                 <div class="relative h-56 overflow-hidden flex flex-col justify-center items-center p-5">
-                                    <!-- <div class="absolute h-1/2 bottom-0 inset-0 bg-gradient-to-t from-white dark:from-neutral-800 to-transparent z-10"></div> -->
                                     <img 
-                                    src="{{ $tool->image ? asset('storage/' . $tool->image) : asset('admin/images/empty-data.webp') }}" 
+                                        src="{{ $tool->image ? asset('storage/' . $tool->image) : asset('admin/images/empty-data.webp') }}" 
                                         alt="{{ $tool->name }}" 
                                         class="w-full h-full rounded-xl object-cover transform transition-transform duration-700 group-hover:scale-110"
                                     >
@@ -477,91 +479,69 @@
 
                                 <div class="relative p-6 -mt-14 z-20">
                                     <div class="bg-white/80 dark:bg-neutral-800/80 backdrop-blur-md rounded-2xl p-4 shadow-sm border border-white/20">
-                                        <h5 class="font-black text-xl text-gray-800 dark:text-white mb-1 group-hover:text-blue-600 transition-colors">
+                                        <h5 class="font-black text-lg sm:text-xl text-gray-800 dark:text-white mb-1 group-hover:text-blue-600 transition-colors truncate">
                                             {{ $tool->name }}
                                         </h5>
                                         <div class="flex items-center gap-2 mb-3">
                                             <div class="h-1 w-10 bg-blue-600 rounded-full"></div>
-                                            <!-- <span class="text-[10px] text-gray-400 font-bold uppercase tracking-tighter">Tools Stock</span> -->
                                         </div>
-
                                         <div class="flex justify-between items-end">
                                             <div>
                                                 <p class="text-[10px] text-gray-400 uppercase font-bold">Ketersediaan</p>
                                                 <p class="text-2xl font-black text-blue-600">{{ $tool->quantity }} <span class="text-xs text-gray-500 font-medium">Unit</span></p>
                                             </div>
-                                            
-                
                                         </div>
                                     </div>
                                 </div>
-
                                 <div class="absolute bottom-0 w-full h-1.5 bg-blue-600 scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
                             </div>
                         </div>
                         @endforeach
-
                     </div>
                 </div>
 
-                <div class="mt-6 flex justify-center">
-                    <a href="#katalog" class="group relative inline-flex items-center justify-center px-10 py-4 font-semibold text-white transition-all duration-500">
-                        <div class="absolute inset-0 rounded-full bg-blue-600 shadow-[0_0_20px_rgba(37,99,235,0.3)] transition-all duration-500 group-hover:bg-blue-700 group-hover:shadow-[0_0_35px_rgba(37,99,235,0.6)] group-hover:scale-105"></div>
-                        
-                        <span class="relative flex items-center gap-3 text-md">
-                            Mulai Jelajahi & Lihat Semua Barang
+                <div class="mt-8 flex justify-center px-4">
+                    <a href="#katalog" class="group relative inline-flex items-center justify-center px-4 md:px-8 py-4 font-semibold text-white transition-all duration-500 w-full sm:w-auto text-center">
+                        <div class="absolute inset-0 rounded-full bg-blue-600 shadow-lg transition-all duration-500 group-hover:bg-blue-700 group-hover:scale-105"></div>
+                        <span class="relative flex items-center justify-center gap-3 text-xs md:text-md lg:text-lg">
+                            Mulai Jelajahi Semua Barang
                             <svg class="w-5 h-5 transform transition-transform duration-500 group-hover:translate-x-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
                             </svg>
                         </span>
                     </a>
                 </div>
-
             </div>
-
         </div>
     </section>
 
-    <section id="faq" class="pt-6 pb-24 bg-white dark:bg-neutral-800 transition-colors duration-300 relative overflow-hidden">
+    <section id="faq" class="pt-6 pb-14 md:pb-20 lg:pb-24 bg-white dark:bg-neutral-800 transition-colors duration-300 relative overflow-hidden">
         <div class="absolute top-0 left-0 -ml-20 mt-20 w-80 h-80 bg-blue-400/10 rounded-full blur-[100px]"></div>
 
         <div class="absolute inset-0 -z-0 overflow-hidden pointer-events-none">
-            <!-- <div class="absolute bottom-0 -left-20 w-96 h-96 bg-blue-400/30 rounded-full blur-3xl dark:bg-blue-600/25"></div>
-            <div class="absolute bottom-0 -right-20 w-[500px] h-[500px] bg-blue-400/30 rounded-full blur-3xl dark:bg-blue-600/25"></div> -->
-            
-            <svg class="absolute inset-0 h-full w-full stroke-gray-300 dark:stroke-neutral-700 [mask-image:radial-gradient(100%_100%_at_bottom_left,white,transparent)]" aria-hidden="true">
-                <defs>
-                    <pattern id="grid-faq" width="100" height="100" x="50%" y="-64" patternUnits="userSpaceOnUse">
-                        <path d="M100 200V.5M.5 .5H200" fill="none" />
-                    </pattern>
-                </defs>
-                <rect width="100%" height="100%" stroke-width="0" fill="url(#grid-faq)" />
-            </svg>
-        </div>
+            </div>
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-16 relative">
             
-            <div class="grid lg:grid-cols-2 gap-16 items-start">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-start">
                 
-                <div class="">
+                <div class="text-center lg:text-left">
                     <h2 class="text-base font-semibold text-blue-600 tracking-wide uppercase">Tanya Jawab</h2>
-                    <p class="mt-2 text-4xl font-extrabold text-gray-900 dark:text-white leading-tight">
-                        Bingung Mengenai <br>
-                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-500">Alur Peminjaman?</span>
+                    <p class="mt-2 text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-white leading-tight">
+                        Bingung Mengenai <br class="hidden sm:block"> <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-500">Alur Peminjaman?</span>
                     </p>
-                    <p class="mt-6 text-lg text-gray-500 dark:text-gray-400 max-w-md">
+                    <p class="mt-4 max-w-2xl text-md md:text-lg sm:text-xl text-gray-500 dark:text-gray-400 mx-auto">
                         Berikut adalah daftar pertanyaan yang paling sering ditanyakan oleh siswa dan guru mengenai penggunaan ToolsHub.
                     </p>
                     
                     <div class="mt-10 space-y-8">
-
                         <div class="flex gap-4 group">
                             <div class="flex-shrink-0 w-12 h-12 rounded-2xl bg-indigo-600/10 dark:bg-indigo-600/20 flex items-center justify-center text-indigo-600 transition-colors group-hover:bg-indigo-600 group-hover:text-white">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke-width="2"/></svg>
                             </div>
                             <div>
-                                <h4 class="text-sm font-black text-gray-900 dark:text-white uppercase tracking-wider">Jam Operasional</h4>
-                                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Senin s/d Jumat (07:00 - 15:30). Libur nasional tutup.</p>
+                                <h4 class="text-left text-sm font-black text-gray-900 dark:text-white uppercase tracking-wider">Jam Operasional</h4>
+                                <p class="text-left text-sm text-gray-500 dark:text-gray-400 mt-1">Senin s/d Jumat (07:00 - 15:30). Libur nasional tutup.</p>
                             </div>
                         </div>
 
@@ -570,8 +550,8 @@
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" stroke-width="2"/></svg>
                             </div>
                             <div>
-                                <h4 class="text-sm font-black text-gray-900 dark:text-white uppercase tracking-wider">Verifikasi Keamanan</h4>
-                                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Setiap peminjaman dipantau secara real-time oleh tim manajemen aset.</p>
+                                <h4 class="text-left text-sm font-black text-gray-900 dark:text-white uppercase tracking-wider">Verifikasi Keamanan</h4>
+                                <p class="text-left text-sm text-gray-500 dark:text-gray-400 mt-1">Setiap peminjaman dipantau secara real-time oleh tim manajemen aset.</p>
                             </div>
                         </div>
                     </div>
@@ -579,47 +559,47 @@
 
                 <div class="space-y-4">
                     <div class="faq-item group">
-                        <button class="flex items-center justify-between w-full p-6 text-left bg-gray-50 dark:bg-neutral-900/50 rounded-2xl border border-gray-100 dark:border-neutral-700 transition-all hover:border-blue-500">
-                            <span class="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 transition-colors">Bagaimana jika barang yang saya pinjam rusak?</span>
-                            <svg class="w-5 h-5 text-gray-400 transition-transform duration-300 transform group-focus:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        <button class="flex items-center justify-between w-full p-5 sm:p-6 text-left bg-gray-50 dark:bg-neutral-900/50 rounded-2xl border border-gray-100 dark:border-neutral-700 transition-all hover:border-blue-500">
+                            <span class="text-md sm:text-lg font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 transition-colors">Bagaimana jika barang yang saya pinjam rusak?</span>
+                            <svg class="w-5 h-5 flex-shrink-0 text-gray-400 transition-transform duration-300 transform group-focus:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                         </button>
-                        <div class="max-h-0 overflow-hidden transition-all duration-300 ease-in-out group-focus-within:max-h-40">
-                            <p class="p-6 text-gray-500 dark:text-gray-400 border-x border-b border-gray-50 dark:border-neutral-700 -mt-2 rounded-b-2xl bg-white dark:bg-neutral-800/30">
+                        <div class="max-h-0 overflow-hidden transition-all duration-300 ease-in-out group-focus-within:max-h-48 sm:group-focus-within:max-h-40">
+                            <p class="p-6 text-sm sm:text-base text-gray-500 dark:text-gray-400 border-x border-b border-gray-50 dark:border-neutral-700 -mt-2 rounded-b-2xl bg-white dark:bg-neutral-800/30">
                                 Segera lapor ke Toolman di ruang aset. Kerusakan akan diperiksa, jika karena kelalaian, peminjam wajib bertanggung jawab sesuai kesepakatan sekolah.
                             </p>
                         </div>
                     </div>
 
                     <div class="faq-item group">
-                        <button class="flex items-center justify-between w-full p-6 text-left bg-gray-50 dark:bg-neutral-900/50 rounded-2xl border border-gray-100 dark:border-neutral-700 transition-all hover:border-blue-500">
-                            <span class="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 transition-colors">Berapa lama batas waktu maksimal peminjaman?</span>
-                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        <button class="flex items-center justify-between w-full p-5 sm:p-6 text-left bg-gray-50 dark:bg-neutral-900/50 rounded-2xl border border-gray-100 dark:border-neutral-700 transition-all hover:border-blue-500">
+                            <span class="text-md sm:text-lg font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 transition-colors">Berapa lama batas waktu maksimal peminjaman?</span>
+                            <svg class="w-5 h-5 flex-shrink-0 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                         </button>
-                        <div class="max-h-0 overflow-hidden transition-all duration-300 ease-in-out group-focus-within:max-h-40">
-                            <p class="p-6 text-gray-500 dark:text-gray-400 border-x border-b border-gray-50 dark:border-neutral-700 -mt-2 rounded-b-2xl bg-white dark:bg-neutral-800/30">
+                        <div class="max-h-0 overflow-hidden transition-all duration-300 ease-in-out group-focus-within:max-h-48 sm:group-focus-within:max-h-40">
+                            <p class="p-6 text-sm sm:text-base text-gray-500 dark:text-gray-400 border-x border-b border-gray-50 dark:border-neutral-700 -mt-2 rounded-b-2xl bg-white dark:bg-neutral-800/30">
                                 Standar peminjaman adalah 1 hari kerja. Untuk kebutuhan proyek jangka panjang, diperlukan surat rekomendasi dari Kaprogli masing-masing.
                             </p>
                         </div>
                     </div>
 
                     <div class="faq-item group">
-                        <button class="flex items-center justify-between w-full p-6 text-left bg-gray-50 dark:bg-neutral-900/50 rounded-2xl border border-gray-100 dark:border-neutral-700 transition-all hover:border-blue-500">
-                            <span class="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 transition-colors">Apakah saya bisa meminjam lebih dari 1 alat?</span>
-                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        <button class="flex items-center justify-between w-full p-5 sm:p-6 text-left bg-gray-50 dark:bg-neutral-900/50 rounded-2xl border border-gray-100 dark:border-neutral-700 transition-all hover:border-blue-500">
+                            <span class="text-md sm:text-lg font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 transition-colors">Apakah saya bisa meminjam lebih dari 1 alat?</span>
+                            <svg class="w-5 h-5 flex-shrink-0 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                         </button>
-                        <div class="max-h-0 overflow-hidden transition-all duration-300 ease-in-out group-focus-within:max-h-40">
-                            <p class="p-6 text-gray-500 dark:text-gray-400 border-x border-b border-gray-50 dark:border-neutral-700 -mt-2 rounded-b-2xl bg-white dark:bg-neutral-800/30">
+                        <div class="max-h-0 overflow-hidden transition-all duration-300 ease-in-out group-focus-within:max-h-48 sm:group-focus-within:max-h-40">
+                            <p class="p-6 text-sm sm:text-base text-gray-500 dark:text-gray-400 border-x border-b border-gray-50 dark:border-neutral-700 -mt-2 rounded-b-2xl bg-white dark:bg-neutral-800/30">
                                 Bisa, selama stok tersedia dan alat tersebut memang dibutuhkan untuk satu rangkaian praktik yang sama.
                             </p>
                         </div>
                     </div>
 
-                    <div class="mt-8 p-6 bg-blue-600 rounded-3xl shadow-xl shadow-blue-500/20 flex items-center justify-between">
+                    <div class="mt-8 p-6 bg-blue-600 rounded-3xl shadow-xl shadow-blue-500/20 flex flex-col sm:flex-row items-center gap-4 justify-between text-center sm:text-left">
                         <div>
                             <p class="text-white font-bold">Masih punya pertanyaan lain?</p>
                             <p class="text-blue-100 text-sm">Hubungi admin melalui form di bawah.</p>
                         </div>
-                        <a href="#footer-contact" class="px-5 py-2.5 bg-white text-blue-600 rounded-xl text-xs font-black uppercase hover:bg-gray-100 transition-colors">
+                        <a href="#footer-contact" class="w-full sm:w-auto px-5 py-2.5 bg-white text-blue-600 rounded-xl text-xs font-black uppercase hover:bg-gray-100 transition-colors">
                             Tanya Admin
                         </a>
                     </div>
@@ -631,10 +611,10 @@
     <footer class="bg-gray-50 dark:bg-neutral-900 border-t border-gray-200 dark:border-neutral-800 pt-16 pb-10 transition-colors duration-300">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-16">
         
-        <div class="grid lg:grid-cols-12 gap-16 items-start mb-10">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-16 items-start mb-16">
             
-            <div class="lg:col-span-3">
-                <a href="/" class="flex mb-6">
+            <div class="md:col-span-2 lg:col-span-3">
+                <a href="/" class="flex mb-6 justify-start">
                     <img src="{{ asset('admin/images/logo.webp') }}" alt="Logo" class="w-48 dark:brightness-1000">
                 </a>
                 <p class="text-sm text-gray-500 dark:text-gray-400 leading-relaxed lg:pr-10 font-medium">
@@ -643,8 +623,8 @@
             </div>
 
             <div class="lg:col-span-2">
-                <h4 class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-widest mb-6">Navigasi</h4>
-                <ul class="space-y-4">
+                <h4 class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-widest mb-6 border-l-4 border-blue-600 pl-3 lg:border-none lg:pl-0">Navigasi</h4>
+                <ul class="grid grid-cols-2 md:grid-cols-1 gap-4">
                     <li><a href="#" class="text-sm font-semibold text-gray-400 hover:text-blue-600 transition-colors">Beranda</a></li>
                     <li><a href="#" class="text-sm font-semibold text-gray-400 hover:text-blue-600 transition-colors">Katalog Alat</a></li>
                     <li><a href="#" class="text-sm font-semibold text-gray-400 hover:text-blue-600 transition-colors">Pusat FAQ</a></li>
@@ -653,67 +633,64 @@
             </div>
 
             <div class="lg:col-span-2">
-                <h4 class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-widest mb-6">Sosial</h4>
-                <ul class="space-y-4">
+                <h4 class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-widest mb-6 border-l-4 border-blue-600 pl-3 lg:border-none lg:pl-0">Sosial</h4>
+                <ul class="flex flex-wrap md:flex-col gap-5">
                     <li>
                         <a href="#" class="group flex items-center gap-3 text-sm font-semibold text-gray-400 hover:text-blue-600 transition-colors">
-                            <svg class="w-5 h-5 stroke-gray-400 group-hover:stroke-blue-600 transition-colors" fill="none" stroke-width="1.5" viewBox="0 0 24 24">
+                            <!-- <svg class="w-5 h-5 stroke-gray-400 group-hover:stroke-blue-600 transition-colors" fill="none" stroke-width="1.5" viewBox="0 0 24 24">
                                 <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
                                 <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
                                 <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
-                            </svg>
+                            </svg> -->
                             <span>Instagram</span>
                         </a>
                     </li>
-
                     <li>
                         <a href="#" class="group flex items-center gap-3 text-sm font-semibold text-gray-400 hover:text-blue-600 transition-colors">
-                            <svg class="w-5 h-5 stroke-gray-400 group-hover:stroke-blue-600 transition-colors" fill="none" stroke-width="1.5" viewBox="0 0 24 24">
+                            <!-- <svg class="w-5 h-5 stroke-gray-400 group-hover:stroke-blue-600 transition-colors" fill="none" stroke-width="1.5" viewBox="0 0 24 24">
                                 <path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"></path>
                                 <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon>
-                            </svg>
+                            </svg> -->
                             <span>YouTube</span>
                         </a>
                     </li>
-
                     <li>
                         <a href="#" class="group flex items-center gap-3 text-sm font-semibold text-gray-400 hover:text-blue-600 transition-colors">
-                            <svg class="w-5 h-5 stroke-gray-400 group-hover:stroke-blue-600 transition-colors" fill="none" stroke-width="1.5" viewBox="0 0 24 24">
+                            <!-- <svg class="w-5 h-5 stroke-gray-400 group-hover:stroke-blue-600 transition-colors" fill="none" stroke-width="1.5" viewBox="0 0 24 24">
                                 <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
-                            </svg>
+                            </svg> -->
                             <span>Github</span>
                         </a>
                     </li>
                 </ul>
             </div>
 
-            <div id="footer-contact" class="lg:col-span-5">
+            <div id="footer-contact" class="md:col-span-2 lg:col-span-5">
                 <div class="space-y-8">
                     <div>
                         <h4 class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-widest mb-2">Hubungi Kami</h4>
                         <div class="h-1 w-12 bg-blue-600 rounded-full"></div>
                     </div>
                     
-                    <form action="#" class="grid grid-cols-2 gap-x-4 gap-y-6">
-                        <div class="col-span-2 md:col-span-1 shadow-md shadow-blue-500/30 rounded-xl">
+                    <form action="#" class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-6">
+                        <div class="sm:col-span-1 shadow-md shadow-blue-500/10 rounded-xl">
                             <input type="text" name="name" placeholder="Nama Lengkap" 
-                                class="w-full bg-white dark:bg-neutral-900 border-2 border-gray-400 dark:border-neutral-700 px-5 py-3.5 rounded-xl outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 transition-all text-sm font-bold text-gray-900 dark:text-white placeholder:font-normal placeholder-gray-500">
+                                class="w-full bg-white dark:bg-neutral-900 border-2 border-gray-200 dark:border-neutral-800 px-5 py-3.5 rounded-xl outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-500/5 transition-all text-sm font-bold text-gray-900 dark:text-white placeholder:font-normal placeholder-gray-500">
                         </div>
 
-                        <div class="col-span-2 md:col-span-1 shadow-md shadow-blue-500/30 rounded-xl">
+                        <div class="sm:col-span-1 shadow-md shadow-blue-500/10 rounded-xl">
                             <input type="email" name="email" placeholder="Alamat Email" 
-                                class="w-full bg-white dark:bg-neutral-900 border-2 border-gray-400 dark:border-neutral-700 px-5 py-3.5 rounded-xl outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 transition-all text-sm font-bold text-gray-900 dark:text-white placeholder:font-normal placeholder-gray-500">
+                                class="w-full bg-white dark:bg-neutral-900 border-2 border-gray-200 dark:border-neutral-800 px-5 py-3.5 rounded-xl outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-500/5 transition-all text-sm font-bold text-gray-900 dark:text-white placeholder:font-normal placeholder-gray-500">
                         </div>
 
-                        <div class="col-span-2 shadow-md shadow-blue-500/30 rounded-xl">
+                        <div class="col-span-1 sm:col-span-2 shadow-md shadow-blue-500/10 rounded-xl">
                             <textarea name="message" rows="3" placeholder="Tulis pesan atau kendala Anda..." 
-                                class="w-full bg-white dark:bg-neutral-900 border-2 border-gray-400 dark:border-neutral-700 px-5 py-3.5 rounded-xl outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 transition-all text-sm font-bold text-gray-900 dark:text-white placeholder:font-normal placeholder-gray-500 resize-none"></textarea>
+                                class="w-full bg-white dark:bg-neutral-900 border-2 border-gray-200 dark:border-neutral-800 px-5 py-3.5 rounded-xl outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-500/5 transition-all text-sm font-bold text-gray-900 dark:text-white placeholder:font-normal placeholder-gray-500 resize-none"></textarea>
                         </div>
 
-                        <div class="col-span-2">
-                            <button type="submit" class="group flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.2em] text-white dark:text-blue-white bg-blue-600 px-6 py-3 rounded-xl hover:bg-blue-700 transition-all">
+                        <div class="col-span-1 sm:col-span-2">
+                            <button type="submit" class="w-full sm:w-auto group flex items-center justify-center gap-3 text-[11px] font-bold uppercase tracking-[0.2em] text-white bg-blue-600 px-8 py-4 rounded-xl hover:bg-blue-700 transition-all">
                                 Kirim Pesan
-                                <span class="w-8 h-[2px] bg-blue-600 dark:bg-blue-400 group-hover:w-12 transition-all duration-300"></span>
                                 <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
                                 </svg>
@@ -725,12 +702,8 @@
 
         </div>
 
-        <div class="pt-10 border-t border-gray-100 dark:border-neutral-800 flex flex-col justify-center items-center gap-8">
-            
-            <div class="flex flex-col items-center gap-1">
-                <p class="text-xs text-center font-medium text-gray-400 uppercase tracking-widest">© 2026 All Rights Reserved</p>
-            </div>
-
+        <div class="pt-10 border-t border-gray-100 dark:border-neutral-800 flex flex-col items-center">
+            <p class="text-[10px] sm:text-xs text-center font-medium text-gray-400 uppercase tracking-[0.3em]">© 2026 ToolsHub SMKN 8 Jember. All Rights Reserved</p>
         </div>
     </div>
 </footer>

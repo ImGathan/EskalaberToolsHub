@@ -5,10 +5,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>{{ env('APP_ENV') == 'local' ? '[LOCAL] ' : '' }}Laravel Starter Kit - @yield('title')</title>
+    <title>Eskalaber ToolsHub</title>
 
     {{-- Favicon --}}
-    @include('_admin._layout.favicon')
+    @include('_user._layout.favicon')
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -26,7 +26,7 @@
 <body>
     <!-- ========== HEADER ========== -->
     <header
-        class="inset-x-0 flex flex-wrap md:justify-start md:flex-nowrap z-[48] w-full bg-white border-b border-gray-200 text-sm py-2.5 lg:py-0 xl:py-0 lg:ps-65 dark:bg-neutral-800 dark:border-neutral-700">
+        class="fixed inset-x-0 flex flex-wrap md:justify-start md:flex-nowrap z-[48] w-full bg-white border-b border-gray-200 text-sm py-1.5 lg:py-0 xl:py-0 lg:ps-65 dark:bg-neutral-800 dark:border-neutral-700">
         <nav class="px-4 sm:px-6 flex basis-full items-center w-full mx-auto">
             <div class="me-5 lg:me-0 lg:hidden flex items-center">
                 <!-- Navigation Toggle -->
@@ -35,12 +35,8 @@
                     aria-haspopup="dialog" aria-expanded="false" aria-controls="hs-application-sidebar"
                     aria-label="Toggle navigation" data-hs-overlay="#hs-application-sidebar">
                     <span class="sr-only">Toggle Navigation</span>
-                    <svg class="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                        stroke-linejoin="round">
-                        <rect width="18" height="18" x="3" y="3" rx="2" />
-                        <path d="M15 3v18" />
-                        <path d="m8 9 3 3-3 3" />
+                    <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                     </svg>
                 </button>
                 <!-- End Navigation Toggle -->
@@ -65,7 +61,7 @@
 
     <!-- Content -->
     <div class="w-full lg:ps-64 bg-white dark:bg-neutral-900 min-h-screen">
-        <div id="main-content" class="p-2 2xl:px-25 px-3 md:px-8 pt-10 sm:p-6 space-y-4 sm:space-y-6">
+        <div id="main-content" class="p-2 2xl:px-25 px-3 md:px-8 pt-24 sm:p-6 space-y-4 sm:space-y-6">
             @if (session('success'))
             <div id="spa-flash-success" style="display: none;">{{ session('success') }}</div>
             @endif

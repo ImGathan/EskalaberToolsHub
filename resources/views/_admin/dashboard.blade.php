@@ -6,15 +6,8 @@
 <div class="space-y-6 py-4">
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-            @php
-                $hour = date('H');
-                $greeting = 'Selamat Malam';
-                if ($hour >= 5 && $hour < 11) $greeting = 'Selamat Pagi';
-                elseif ($hour >= 11 && $hour < 15) $greeting = 'Selamat Siang';
-                elseif ($hour >= 15 && $hour < 18) $greeting = 'Selamat Sore';
-            @endphp
             <h1 class="text-2xl font-bold text-gray-800 dark:text-neutral-200">
-                {{ $greeting }}, {{ Auth::user()->username ?? 'Admin' }}! 👋
+                Selamat Datang Kembali, {{ Auth::user()->username ?? 'Admin' }}! 👋
             </h1>
             <p class="text-sm text-gray-500 dark:text-neutral-500">
                 Pantau performa dan aktivitas peminjaman hari ini.
@@ -82,15 +75,24 @@
         <div class="p-4 md:p-5 min-h-[400px] flex flex-col bg-white border border-gray-200 shadow-sm rounded-2xl dark:bg-neutral-800 dark:border-neutral-700">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-sm font-semibold text-gray-800 dark:text-neutral-200 uppercase">Tren Peminjaman Bulanan</h2>
+                <div class="inline-flex bg-gray-100 rounded-lg p-1 dark:bg-neutral-700">
+                    <a href="?filter=day" class="px-3 py-1 text-xs rounded-md {{ request('filter') == 'day' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-500' }}">Hari</a>
+                    <a href="?filter=week" class="px-3 py-1 text-xs rounded-md {{ request('filter') == 'week' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-500' }}">Minggu</a>
+                    <a href="?filter=month" class="px-3 py-1 text-xs rounded-md {{ request('filter', 'month') == 'month' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-500' }}">Bulan</a>
+                </div>
             </div>
-            <div id="hs-curved-area-line-chart"></div>
+            <div class="w-full" style="min-height: 300px;">
+                <div id="admin-trend-chart"></div>
+            </div>
         </div>
 
         <div class="p-4 md:p-5 min-h-[400px] flex flex-col bg-white border border-gray-200 shadow-sm rounded-2xl dark:bg-neutral-800 dark:border-neutral-700">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-sm font-semibold text-gray-800 dark:text-neutral-200 uppercase">Kategori Barang Paling Laku</h2>
             </div>
-            <div id="hs-single-bar-chart"></div>
+            <div class="w-full" style="min-height: 300px;">
+                <div id="admin-bar-chart"></div>
+            </div>
         </div>
     </div>
 
@@ -124,77 +126,63 @@
 
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script>
-    window.addEventListener('load', () => {
-        // Ambil data dari Laravel (Blade)
-        const labelsPeminjaman = @json($chartLabels ?? []);
-        const dataPeminjaman = @json($chartData ?? []);
-        const labelsKategori = @json($kategoriLabels ?? []);
-        const dataKategori = @json($kategoriData ?? []);
-
-        // 1. Line Chart (Tren Peminjaman)
-        if (document.querySelector("#hs-curved-area-line-chart")) {
-            new ApexCharts(document.querySelector("#hs-curved-area-line-chart"), {
-                chart: {
-                    height: 300,
-                    type: 'area',
-                    toolbar: { show: false },
-                    zoom: { enabled: false }
-                },
-                dataLabels: { enabled: false },
-                stroke: { curve: 'smooth', width: 3 },
+    const initDashboardCharts = () => {
+        // --- 1. Inisialisasi Chart Tren ---
+        const trendEl = document.querySelector("#admin-trend-chart");
+        if (trendEl) {
+            trendEl.innerHTML = ''; // Penting untuk cegah lag/bug
+            new ApexCharts(trendEl, {
+                chart: { height: 320, type: 'area', toolbar: { show: false } },
+                series: [{ name: 'Pinjaman', data: @json($chartData) }],
+                xaxis: { categories: @json($chartLabels) },
                 colors: ['#3b82f6'],
-                series: [{
-                    name: 'Total Pinjam',
-                    data: dataPeminjaman
-                }],
-                xaxis: {
-                    categories: labelsPeminjaman,
-                    axisBorder: { show: false },
-                    axisTicks: { show: false }
-                },
-                fill: {
-                    type: 'gradient',
-                    gradient: {
-                        shadeIntensity: 1,
-                        opacityFrom: 0.4,
-                        opacityTo: 0.1,
-                        stops: [0, 90, 100]
-                    }
-                },
-                grid: { borderColor: '#e5e7eb', strokeDashArray: 5 }
+                stroke: { curve: 'smooth', width: 3 },
+                dataLabels: { enabled: false },
+                fill: { type: 'gradient', gradient: { opacityFrom: 0.4, opacityTo: 0.1 } }
             }).render();
         }
 
-        // 2. Bar Chart (Kategori Barang)
-        if (document.querySelector("#hs-single-bar-chart")) {
-            new ApexCharts(document.querySelector("#hs-single-bar-chart"), {
-                chart: {
-                    height: 300,
-                    type: 'bar',
-                    toolbar: { show: false }
-                },
-                plotOptions: {
-                    bar: {
-                        borderRadius: 4,
-                        columnWidth: '50%',
-                        distributed: true // Membuat warna tiap bar berbeda jika mau
+        // --- 2. Inisialisasi Chart Kategori ---
+        const barEl = document.querySelector("#admin-bar-chart");
+        if (barEl) {
+            barEl.innerHTML = '';
+            new ApexCharts(barEl, {
+                chart: { height: 320, type: 'bar', toolbar: { show: false } },
+                series: [{ 
+                    name: 'Total Dipinjam', // Ubah nama series agar lebih jelas
+                    data: @json($kategoriData ?? []) 
+                }],
+                xaxis: { categories: @json($kategoriLabels ?? []) },
+                tooltip: {
+                    y: {
+                        formatter: function (val) {
+                            return val + " Kali Dipinjam"
+                        }
                     }
                 },
-                dataLabels: { enabled: false },
-                legend: { show: false },
-                colors: ['#3b82f6', '#22c55e', '#f59e0b', '#ef4444', '#8b5cf6'],
-                series: [{
-                    name: 'Jumlah Unit',
-                    data: dataKategori
-                }],
-                xaxis: {
-                    categories: labelsKategori,
-                    axisBorder: { show: false },
-                    axisTicks: { show: false }
-                },
-                grid: { borderColor: '#e5e7eb', strokeDashArray: 5 }
+                plotOptions: { bar: { borderRadius: 4, distributed: true, columnWidth: '50%' } },
+                colors: ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#6366f1'],
+                legend: { show: false }
             }).render();
         }
-    });
+    };
+
+    if (window.chartWatcher) clearInterval(window.chartWatcher);
+
+    window.chartWatcher = setInterval(() => {
+        const trendElem = document.querySelector("#admin-trend-chart");
+        const barElem = document.querySelector("#admin-bar-chart");
+
+        // Jika elemen ada di layar tapi isinya masih kosong (belum digambar)
+        if (trendElem && trendElem.innerHTML === '') {
+            console.log("Admin Chart: Menggambar ulang...");
+            initDashboardCharts();
+        }
+    }, 500); // Cek setiap 0.5 detik
+
+    // Tetap jaga-jaga dengan event standar
+    document.addEventListener("turbo:load", initDashboardCharts);
+    document.addEventListener("livewire:navigated", initDashboardCharts);
+
 </script>
 @endsection

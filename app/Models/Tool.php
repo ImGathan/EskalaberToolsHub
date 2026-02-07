@@ -15,6 +15,7 @@ class Tool extends Model
         'quantity',
         'status',
         'place_id',
+        'type_id',
         'fine',
     ];
 
@@ -26,6 +27,11 @@ class Tool extends Model
     public function place()
     {
         return $this->belongsTo(Place::class, 'place_id');
+    }
+
+    public function type()
+    {
+        return $this->belongsTo(Type::class, 'type_id');
     }
 
     public function toolsman()

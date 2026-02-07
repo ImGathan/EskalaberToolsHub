@@ -62,6 +62,7 @@
                     <th scope="col" class="px-6 py-3 text-start text-xs font-semibold uppercase text-gray-800 dark:text-neutral-200">Barang</th>
                     <th scope="col" class="px-6 py-3 text-start text-xs font-semibold uppercase text-gray-800 dark:text-neutral-200">Stok</th>
                     <th scope="col" class="px-6 py-3 text-start text-xs font-semibold uppercase text-gray-800 dark:text-neutral-200">Kategori & Lokasi</th>
+                    <th scope="col" class="px-6 py-3 text-start text-xs font-semibold uppercase text-gray-800 dark:text-neutral-200">Jenis Barang</th>
                     <th scope="col" class="px-6 py-3 text-start text-xs font-semibold uppercase text-gray-800 dark:text-neutral-200">Toolsman</th>
                     <th scope="col" class="px-6 py-3 text-start text-xs font-semibold uppercase text-gray-800 dark:text-neutral-200">Status</th>
                     <th scope="col" class="px-6 py-3 text-end text-xs font-semibold uppercase text-gray-800 dark:text-neutral-200">Aksi</th>
@@ -89,6 +90,11 @@
                             <div class="flex flex-col">
                                 <span class="text-sm font-medium text-gray-800 dark:text-neutral-200">{{ $tool->category->name }}</span>
                                 <span class="text-xs text-gray-500 dark:text-neutral-500">{{ $tool->place->name ?? '-' }}</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex flex-col">
+                                <span class="text-sm font-medium text-gray-800 dark:text-neutral-200">{{ $tool->type->name }}</span>
                             </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">

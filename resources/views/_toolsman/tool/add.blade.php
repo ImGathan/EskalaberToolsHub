@@ -98,6 +98,25 @@
                 </div>
 
                 <div>
+                    <label for="type_id" class="block text-sm font-medium mb-2 dark:text-white">Jenis Barang <span
+                            class="text-red-500">*</span></label>
+                    <select id="type_id" name="type_id"
+                        class="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600 @error('category_id') border-red-500 focus:border-red-500 focus:ring-red-500 @enderror"
+                        required>
+                        <option value="">-- Pilih Jenis Barang --</option>
+                        @foreach ($types as $type)
+                        <option value="{{ $type->id }}"
+                            {{ old('type_id') == $type->id ? 'selected' : '' }}>
+                            {{ $type->name }}
+                        </option>
+                        @endforeach
+                    </select>
+                    @error('type_id')
+                    <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
                     <label for="category_id" class="block text-sm font-medium mb-2 dark:text-white">Lokasi Barang <span
                             class="text-red-500">*</span></label>
                     <select id="place_id" name="place_id"

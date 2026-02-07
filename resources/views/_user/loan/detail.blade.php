@@ -103,51 +103,105 @@
         @if($data->status === 'returned' && $data->fine_amount > 0)
             {{-- Kolom Kanan: Ringkasan Biaya/Denda (Jika Ada) --}}
             <div class="space-y-6">
-
                 {{-- Alert Jika Terlambat --}}
-                @if(now()->startOfDay()->greaterThan($data->due_date->startOfDay()) && $data->status === 'approve' || $data->status === 'returned')
-                <div class="bg-red-50 border border-red-200 rounded-xl p-4 dark:bg-red-800/10 dark:border-red-900">
+                @if(now()->startOfDay()->greaterThan($data->due_date->startOfDay()) && $data->status === 'approve' || $data->status === 'returned' && $data->fine_status === 0)
+                <div class="bg-red-50 border-[1.5px] border-red-500 rounded-xl p-4 dark:bg-red-800/10">
                     <div class="flex">
-                        <svg class="shrink-0 size-4 text-red-600 mt-0.5 dark:text-red-500" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        <svg class="shrink-0 size-5 text-red-600 dark:text-red-500" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                         <div class="ms-3">
-                            <p class="text-sm text-red-700 dark:text-red-400 font-medium">
-                                Anda mempunyai tagihan keterlambatan. Segera lakukan pembayaran denda ke admin!
+                            <h3 class="text-sm font-bold text-red-800 dark:text-red-500">Peringatan Tunggakan</h3>
+                            <p class="text-xs text-red-700 dark:text-red-400 mt-1">
+                                Anda memiliki denda keterlambatan yang belum diselesaikan. Mohon segera hubungi Admin.
                             </p>
                         </div>
                     </div>
                 </div>
                 @endif
 
-                <div class="bg-white shadow-lg rounded-2xl p-6 dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700">
-                    <h4 class="text-sm font-bold text-gray-800 dark:text-neutral-200 uppercase mb-4">Ringkasan Biaya</h4>
-                    <div class="space-y-3">
-                        <div class="flex justify-between text-sm">
-                            <span class="text-gray-500">Biaya Pinjam</span>
-                            <span class="font-medium text-gray-800 dark:text-neutral-200">Gratis</span>
+                {{-- Billing Card --}}
+                <div class="bg-white shadow-xl rounded-2xl overflow-hidden dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700">
+                    {{-- Body Billing --}}
+                    <div class="p-6 space-y-4">
+                        {{-- Item List --}}
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center text-sm">
+                                <div class="flex flex-col">
+                                    <span class="text-gray-500">Biaya Layanan Pinjam</span>
+                                </div>
+                                <span class="font-bold text-emerald-600 uppercase text-xs">Gratis</span>
+                            </div>
+
+                            <div class="flex justify-between items-center text-sm">
+                                <div class="flex flex-col">
+                                    <span class="text-gray-500">Kuantitas Barang</span>
+                                </div>
+                                <span class="font-semibold text-gray-800 dark:text-neutral-200">{{ $data->quantity }} Unit</span>
+                            </div>
+
+                            <div class="flex justify-between items-center text-sm">
+                                <div class="flex flex-col">
+                                    <span class="text-gray-500">Denda Per Hari</span>
+                                </div>
+                                <span class="font-semibold text-gray-800 dark:text-neutral-200">Rp {{ number_format($data->tool->fine, 0, ',', '.') }}</span>
+                            </div>
+
+                            <div class="flex justify-between items-center text-sm">
+                                <div class="flex flex-col">
+                                    <span class="text-gray-500">Total Keterlambatan</span>
+                                </div>
+                                <span class="font-bold {{ $data->hari_terlambat > 0 ? 'text-red-600' : 'text-gray-800 dark:text-neutral-200' }}">
+                                    {{ $data->hari_terlambat }} Hari
+                                </span>
+                            </div>
                         </div>
-                        <div class="flex justify-between text-sm">
-                            <span class="text-gray-500">Jumlah Barang Dipinjam</span>
-                            <span class="font-medium text-gray-800 dark:text-neutral-200">{{ $data->quantity }} Unit</span>
+
+                        {{-- Divider --}}
+                        <div class="relative py-4">
+                            <div class="absolute inset-0 flex items-center" aria-hidden="true">
+                                <div class="w-full border-t border-dashed border-gray-200 dark:border-neutral-700"></div>
+                            </div>
                         </div>
-                        <div class="flex justify-between text-sm">
-                            <span class="text-gray-500">Harga Denda Barang</span>
-                            <span class="font-medium text-gray-800 dark:text-neutral-200">Rp. {{ number_format($data->tool->fine, 0, ',', '.') }}</span>
-                        </div>
-                        <div class="flex justify-between text-sm">
-                            <span class="text-gray-500">Hari Keterlambatan</span>
-                            <span class="font-medium {{ $data->hari_terlambat > 0 ? 'text-red-600' : 'text-gray-800 dark:text-neutral-200' }}">
-                                {{ $data->hari_terlambat }} Hari
-                            </span>
-                        </div>
-                        <div class="border-t border-gray-100 dark:border-neutral-700 pt-3 flex justify-between">
-                            <span class="font-bold text-gray-800 dark:text-neutral-200">Total</span>
-                            <span class="font-bold text-blue-600">Rp {{ number_format($data->fine_amount, 0, ',', '.') }}</span>
+
+                        {{-- Total Section --}}
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm font-bold text-gray-800 dark:text-neutral-200 uppercase">Total Tagihan</span>
+                                <div class="text-right">
+                                    <span class="block text-xl font-black text-blue-600 dark:text-blue-500 tracking-tighter">
+                                        Rp {{ number_format($data->fine_amount, 0, ',', '.') }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="flex justify-between items-center p-3 bg-gray-50 dark:bg-neutral-900/50 rounded-xl border border-gray-100 dark:border-neutral-700">
+                                <span class="text-xs font-bold text-gray-500 uppercase">Status</span>
+                                @if($data->fine_status == 0)
+                                    <span class="flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase bg-red-100 text-red-700 border border-red-200">
+                                        <span class="size-1.5 rounded-full bg-red-600"></span>
+                                        Belum Bayar
+                                    </span>
+                                @else
+                                    <span class="flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase bg-emerald-100 text-emerald-700 border border-emerald-200">
+                                        <svg class="size-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                        Lunas
+                                    </span>
+                                @endif
+                            </div>
                         </div>
                     </div>
                 </div>
-                
-                
             </div>
         @endif
     </div>
+
+<script>
+    // Mencegah browser otomatis scroll ke elemen tertentu saat load
+    if ('scrollRestoration' in history) {
+        history.scrollRestoration = 'manual';
+    }
+    
+    // Memastikan halaman mulai dari paling atas
+    window.scrollTo(0, 0);
+</script>
+
 @endsection

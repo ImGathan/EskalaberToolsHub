@@ -19,7 +19,10 @@ class Loan extends Model
         'return_date',
         'fine_amount',
         'information',
-        'status', // <--- WAJIB ADA agar bisa disimpan ke DB
+        'status',
+        'fine_status',
+        'fine_paid_at',
+        'amount_paid',
     ];
 
     // WAJIB ADA: Agar Laravel tahu kolom ini adalah tanggal
@@ -67,7 +70,7 @@ class Loan extends Model
             }
 
         // 2. Logika Denda: Berjalan jika 'approve', Berhenti jika 'returned'
-        if (in_array($loan->status, ['approve', 'returned']) && $loan->due_date) {
+        if (in_array($loan->status, ['approve', 'returning', 'returned']) && $loan->due_date) {
             $due = Carbon::parse($loan->due_date)->startOfDay();
             
             // KUNCINYA DI SINI:
@@ -109,6 +112,18 @@ class Loan extends Model
 
         if ($this->status === 'reject') return 'Peminjaman Ditolak';
 
+        if ($this->status === 'returning') {
+            $now = now()->startOfDay(); 
+            $dueDate = \Carbon\Carbon::parse($this->due_date)->startOfDay();
+
+            if ($now->greaterThan($dueDate)) {
+                $days = abs($now->diffInDays($dueDate));
+                return "Terlambat " . $days . " Hari";
+            }
+                        
+            return 'Dalam Peminjaman';
+        }
+
         if ($this->status === 'returned') {
             
             $batasWaktu = $this->return_date ? $this->return_date->startOfDay() : now()->startOfDay(); 
@@ -137,6 +152,9 @@ class Loan extends Model
 
             case 'reject':
                 return 'text-gray-700 dark:text-neutral-300';
+
+            case 'returning':
+                return 'text-blue-700 dark:text-blue-500';
 
             case 'returned':
                 $compareDate = $this->return_date ? $this->return_date->startOfDay() : now()->startOfDay(); 

@@ -7,13 +7,16 @@ use Illuminate\Http\Request;
 use App\Models\Tool;
 use App\Models\Category;
 use App\Models\Place;
+use App\Models\Type;
 use Illuminate\Support\Facades\Storage;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class ToolController extends Controller
 {
     public function index(Request $request) {
         $keywords = $request->get('keywords');
-        $tools = Tool::with('category.toolsman', 'place')->when($keywords, function ($query, $keywords) {
+        $tools = Tool::with('category.toolsman', 'place', 'type')->when($keywords, function ($query, $keywords) {
             return $query->where('name', 'like', '%'.$keywords.'%');
         })->paginate(10);
 
@@ -22,7 +25,9 @@ class ToolController extends Controller
 
     public function add() {
         $categories = Category::all();
-        return view('_admin.tool.add', compact('categories', 'places'));
+        $places = Place::all();
+        $types = Type::all();
+        return view('_admin.tool.add', compact('categories', 'places', 'types'));
     }
 
     public function doCreate(Request $request) {
@@ -30,7 +35,8 @@ class ToolController extends Controller
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'name' => 'required',
             'category_id' => 'required',
-            'place_id' => 'required',
+            'place_id' => 'required',   
+            'type_id' => 'required',
             'quantity' => 'required|numeric',
             'fine' => 'required|numeric',
         ]);
@@ -55,7 +61,8 @@ class ToolController extends Controller
         $tool = Tool::findOrFail($id);
         $categories = Category::all();
         $places = Place::all();
-        return view('_admin.tool.update', compact('tool', 'categories', 'places'));
+        $types = Type::all();
+        return view('_admin.tool.update', compact('tool', 'categories', 'places', 'types'));
     }
     
     public function doUpdate(int $id, Request $request) {
@@ -67,6 +74,7 @@ class ToolController extends Controller
             'name' => 'required',
             'category_id' => 'required',
             'place_id' => 'required',
+            'type_id' => 'required',
             'quantity' => 'required|numeric',
             'fine' => 'required|numeric',
         ]);
@@ -101,6 +109,25 @@ class ToolController extends Controller
         }
         $tool->delete($id);
         return redirect()->route('admin.tools.index')->with('success', 'Tool deleted successfully');
+    }
+
+    public function generateQR($id)
+    {
+        $tool = Tool::findOrFail($id);
+        $url = route('user.loans.add', ['tool_id' => $tool->id]);
+        $qrcode = base64_encode(QrCode::format('svg')->size(200)->margin(0)->errorCorrection('H')->generate($url));
+
+        $data = [
+            'tool' => $tool,
+            'url' => $url,
+            'qrcode' => $qrcode
+        ];
+
+        $customPaper = [0, 0, 300, 300];
+
+        $pdf = Pdf::loadView('_admin.tool.generate-qr', $data)->setPaper($customPaper);
+
+        return $pdf->download('Kode QR ' . $tool->name . '.pdf');
     }
 
 }

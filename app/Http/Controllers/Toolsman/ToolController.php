@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Tool;
 use App\Models\Category;
 use App\Models\Place;
+use App\Models\Type;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 
@@ -15,7 +16,7 @@ class ToolController extends Controller
     public function index(Request $request) {
         $userId = Auth::user()->id;
         $keywords = $request->get('keywords');
-        $tools = Tool::with('category.toolsman', 'place')
+        $tools = Tool::with('category.toolsman', 'place', 'type')
         ->whereHas('category.toolsman', function ($query) use ($userId) {
             return $query->where('toolsman_id', $userId);
         })
@@ -31,7 +32,8 @@ class ToolController extends Controller
         $userId = Auth::user()->id;
         $categories = Category::where('toolsman_id', $userId)->get();
         $places = Place::all();
-        return view('_toolsman.tool.add', compact('categories', 'places'));
+        $types = Type::all();
+        return view('_toolsman.tool.add', compact('categories', 'places', 'types'));
     }
 
     public function doCreate(Request $request) {
@@ -46,6 +48,7 @@ class ToolController extends Controller
             'quantity' => 'required|numeric',
             'fine' => 'required|numeric',
             'place_id' => 'required',
+            'type_id' => 'required',
         ]);
 
         $data = $request->all();
@@ -72,7 +75,8 @@ class ToolController extends Controller
         })->findOrFail($id);
         $categories = Category::all();
         $places = Place::all();
-        return view('_toolsman.tool.update', compact('tool', 'categories', 'places'));
+        $types = Type::all();
+        return view('_toolsman.tool.update', compact('tool', 'categories', 'places', 'types'));
     }
     
     public function doUpdate(int $id, Request $request) {
@@ -89,6 +93,7 @@ class ToolController extends Controller
             'name' => 'required',
             'quantity' => 'required|numeric',
             'place_id' => 'required',
+            'type_id' => 'required',
             'fine' => 'required|numeric'
         ]);
         

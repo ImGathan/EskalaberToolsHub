@@ -8,13 +8,16 @@ use App\Models\User;
 use App\Models\Tool;
 use App\Models\Loan;
 use App\Models\ActivityLog;
-use App\Models\Category; // Pastikan model Category diimport jika ada
+use App\Models\Category;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $filter = $request->get('filter', 'day'); // Default filter harian
+
         $formatNumber = function($num) {
             if ($num >= 1000) {
                 return round($num / 1000, 1) . 'k';
@@ -31,43 +34,61 @@ class DashboardController extends Controller
         // --- Data Aktivitas ---
         $activityLogs = ActivityLog::orderBy('created_at', 'desc')->take(5)->get();
 
-        // --- 1. DATA UNTUK TREN PEMINJAMAN (Line Chart) ---
-        // Mengambil jumlah peminjaman dalam 7 hari terakhir
-        $loanTrends = Loan::select(DB::raw('DATE(created_at) as date'), DB::raw('count(*) as total'))
-            ->where('created_at', '>=', now()->subDays(6))
-            ->groupBy('date')
-            ->orderBy('date', 'asc')
-            ->get();
+        // --- 1. DATA UNTUK TREN PEMINJAMAN (Dynamic Filter) ---
+        $query = Loan::query();
 
-        $chartLabels = $loanTrends->pluck('date')->map(function($date) {
-            return date('d M', strtotime($date)); // Ubah format jadi "28 Jan"
-        });
+        if ($filter === 'month') {
+            $query->select(
+                DB::raw("DATE_FORMAT(created_at, '%Y-%m') as key_date"),
+                DB::raw("DATE_FORMAT(created_at, '%M') as label"),
+                DB::raw("COUNT(*) as total")
+            )
+            ->where('created_at', '>=', now()->subMonths(6))
+            ->groupBy('key_date', 'label')
+            ->orderBy('key_date', 'asc');
+        } elseif ($filter === 'week') {
+            $query->select(
+                DB::raw("YEARWEEK(created_at) as key_date"),
+                DB::raw("CONCAT('Minggu ', WEEK(created_at)) as label"),
+                DB::raw("COUNT(*) as total")
+            )
+            ->where('created_at', '>=', now()->subWeeks(4))
+            ->groupBy('key_date', 'label')
+            ->orderBy('key_date', 'asc');
+        } else {
+            // Default 7 Hari Terakhir
+            $query->select(
+                DB::raw("DATE(created_at) as key_date"),
+                DB::raw("DATE_FORMAT(created_at, '%d %b') as label"),
+                DB::raw("COUNT(*) as total")
+            )
+            ->where('created_at', '>=', now()->subDays(30))
+            ->groupBy('key_date', 'label')
+            ->orderBy('key_date', 'asc');
+        }
+
+        $loanTrends = $query->get();
+        $chartLabels = $loanTrends->pluck('label');
         $chartData = $loanTrends->pluck('total');
 
-        // --- 2. DATA UNTUK KATEGORI (Bar Chart) ---
-        // Mengambil kategori dan jumlah barang di dalamnya
-        // Sesuaikan 'category' dan 'tools' dengan nama relasi/tabel kamu
-        $categoryStats = DB::table('categories')
-            ->leftJoin('tools', 'categories.id', '=', 'tools.category_id')
-            ->select('categories.name', DB::raw('count(tools.id) as total'))
-            ->groupBy('categories.id', 'categories.name')
-            ->orderBy('total', 'desc')
-            ->take(6)
-            ->get();
+        // --- 2. DATA UNTUK KATEGORI (Kategori Paling Sering Dipinjam) ---
+    $categoryStats = DB::table('loans')
+        ->join('tools', 'loans.tool_id', '=', 'tools.id')
+        ->join('categories', 'tools.category_id', '=', 'categories.id')
+        ->select('categories.name', DB::raw('count(loans.id) as total_dipinjam'))
+        // Jika untuk Toolsman, tambahkan where untuk filter user/kategori miliknya di sini
+        ->groupBy('categories.id', 'categories.name')
+        ->orderBy('total_dipinjam', 'desc')
+        ->take(6)
+        ->get();
 
-        $kategoriLabels = $categoryStats->pluck('name');
-        $kategoriData = $categoryStats->pluck('total');
+    $kategoriLabels = $categoryStats->pluck('name');
+    $kategoriData = $categoryStats->pluck('total_dipinjam');
 
         return view('_admin.dashboard', compact(
-            'totalPengguna', 
-            'totalPeminjaman', 
-            'totalBarang', 
-            'totalPengembalianTerlambat', 
-            'activityLogs',
-            'chartLabels',
-            'chartData',
-            'kategoriLabels',
-            'kategoriData'
+            'totalPengguna', 'totalPeminjaman', 'totalBarang', 
+            'totalPengembalianTerlambat', 'activityLogs',
+            'chartLabels', 'chartData', 'kategoriLabels', 'kategoriData', 'filter'
         ));
     }
 }

@@ -26,6 +26,8 @@ class LoanController extends Controller
             ->where(function ($query) use ($status) {
                 if ($status === 'history') {
                     $query->whereIn('status', ['reject', 'returned']);
+                } elseif ($status === 'on_loan') {
+                    $query->whereIn('status', ['approve', 'returning']);
                 } else {
                     $query->where('status', $status);
                 }
@@ -46,14 +48,16 @@ class LoanController extends Controller
         $countPending = Loan::whereHas('tool.category.toolsman', function($query) use ($userId) {
             $query->where('toolsman_id', $userId);
         })->where('status', 'pending')->count();
-        $countApprove = Loan::whereHas('tool.category.toolsman', function($query) use ($userId) {
+
+        $countOnLoan = Loan::whereHas('tool.category.toolsman', function($query) use ($userId) {
             $query->where('toolsman_id', $userId);
-        })->where('status', 'approve')->count();
+        })->where('status', 'approve')->orWhere('status', 'returning')->count();
+        
         $countReject = Loan::whereHas('tool.category.toolsman', function($query) use ($userId) {
             $query->where('toolsman_id', $userId);
         })->where('status', 'reject')->count();
 
-        return view('_toolsman.loan.index', compact('loans', 'countPending', 'countApprove', 'countReject'));
+        return view('_toolsman.loan.index', compact('loans', 'countPending', 'countOnLoan', 'countReject'));
     }
 
     public function approve($id) 
@@ -67,10 +71,16 @@ class LoanController extends Controller
 
         DB::transaction(function() use ($loan) {
             $loan->update([
-                'status'=>'approve',
+                'status' => 'approve',
                 'approval_date' => now()
             ]);
-            $loan->tool->update(['quantity' => $loan->tool->quantity - $loan->quantity]);
+            $tool = $loan->tool()->first();
+            
+            $tool->quantity = $tool->quantity - $loan->quantity;
+            
+            $tool->status = ($tool->quantity <= 0) ? 'Tidak Tersedia' : 'Tersedia';
+            
+            $tool->save(); 
         });
 
         ActivityLog::record( 'Penyetujuan Pinjaman', Auth::user()->username . ' menyetujui pinjaman oleh ' . $loan->user->username . ' yaitu ' . $loan->tool->name . ' sebanyak ' . $loan->quantity . ' unit.');
@@ -95,11 +105,16 @@ class LoanController extends Controller
         $loan = Loan::findOrFail($id);
 
         DB::transaction(function() use ($loan) {
+   
             $loan->update([
-                'status'=>'returned',
+                'status' => 'returned',
                 'return_date' => now()
             ]);
-            $loan->tool->update(['quantity' => $loan->tool->quantity + $loan->quantity]);
+
+            $tool = $loan->tool()->first();
+            $tool->quantity = $tool->quantity + $loan->quantity;
+            $tool->status = ($tool->quantity <= 0) ? 'Tidak Tersedia' : 'Tersedia';
+            $tool->save(); 
         });
 
         ActivityLog::record( 'Pengembalian Pinjaman', Auth::user()->username . ' menyetujui pengembalian pinjaman oleh ' . $loan->user->username . ' yaitu ' . $loan->tool->name . ' sebanyak ' . $loan->quantity . ' unit.');
@@ -122,11 +137,9 @@ class LoanController extends Controller
             'loan' => $loan
         ];
 
-        // Load view khusus PDF dan set ukuran kertas
         $pdf = Pdf::loadView('_toolsman.loan.keterlambatan_report', $data)
                 ->setPaper('a4', 'portrait');
 
-        // Nama file otomatis: Laporan_Terlambat_Username_Tanggal.pdf
         return $pdf->download('Laporan_Terlambat_' . $loan->user->username . '_' . date('Ymd') . '.pdf');
     }
 
