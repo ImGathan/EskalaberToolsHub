@@ -1,6 +1,6 @@
 @extends('_admin._layout.app')
 
-@section('title', 'Detail Pengguna')
+@section('title', 'Detail Toolsman')
 
 @php
     use App\Constants\UserConst;
@@ -10,7 +10,7 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div class="bg-white overflow-hidden shadow-lg rounded-2xl dark:bg-neutral-800">
             <div class="px-6 py-4 border-b border-gray-200 dark:border-neutral-700 flex items-center">
-                <a href="{{ route('admin.users.index') }}"
+                <a href="{{ route('admin.toolsmans.index') }}"
                     class="py-3 px-3 inline-flex items-center gap-x-2 text-xl rounded-xl border border-gray-200 bg-white text-gray-800 shadow-md hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-800 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-700 dark:focus:bg-neutral-700 cursor-pointer">
                     <svg class="shrink-0 size-5" xmlns="http://www.w3.org/2000/svg" width="90" height="90"
                         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -21,7 +21,7 @@
                 </a>
                 <div class="ms-3">
                     <h2 class="text-xl font-semibold text-gray-800 dark:text-neutral-200">
-                        Detail Data Pengguna
+                        Detail Data Toolsman
                     </h2>
                 </div>
             </div>
@@ -34,7 +34,7 @@
                     </div>
                     <div>
                         <h3 class="text-2xl font-bold text-gray-800 dark:text-white">{{ $data->username }}</h3>
-                        <h3 class="text-md font-semibold text-gray-600 dark:text-neutral-400">{{ $data->current_class }}</h3>
+                        <h3 class="text-md font-semibold text-gray-600 dark:text-neutral-400">{{ $data->class }}</h3>
                         <div class="mt-2">
                             <span
                                 class="inline-flex items-center gap-x-1.5 py-1.5 px-3 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-neutral-700 dark:text-neutral-200 uppercase">

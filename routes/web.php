@@ -2,9 +2,11 @@
 
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\DepartmentController;
 use App\Http\Controllers\Admin\PlaceController;
 use App\Http\Controllers\Admin\TypeController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\ToolsmanController;
 use App\Http\Controllers\Admin\ToolController;
 use App\Http\Controllers\Admin\ActivityLogController;
 use App\Http\Controllers\Admin\DashboardController;
@@ -41,6 +43,17 @@ Route::middleware('auth', 'role:SUPERADMIN')->prefix('admin')->name('admin.')->g
         Route::post('/reset-password/{id}', [UserController::class, 'resetPassword'])->name('resetPassword');
     });
 
+    Route::prefix('toolsmans')->name('toolsmans.')->group(function () {
+        Route::get('/', [ToolsmanController::class, 'index'])->name('index');
+        Route::get('/add', [ToolsmanController::class, 'add'])->name('add');
+        Route::post('/create', [ToolsmanController::class, 'doCreate'])->name('create');
+        Route::get('/detail/{id}', [ToolsmanController::class, 'detail'])->name('detail');
+        Route::get('/update/{id}', [ToolsmanController::class, 'update'])->name('update');
+        Route::post('/update/{id}', [ToolsmanController::class, 'doUpdate'])->name('doUpdate');
+        Route::delete('/delete/{id}', [ToolsmanController::class, 'delete'])->name('delete');
+        Route::post('/reset-password/{id}', [ToolsmanController::class, 'resetPassword'])->name('resetPassword');
+    });
+
     Route::prefix('places')->name('places.')->group(function () {
         Route::get('/', [PlaceController::class, 'index'])->name('index');
         Route::get('/add', [PlaceController::class, 'add'])->name('add');
@@ -57,6 +70,15 @@ Route::middleware('auth', 'role:SUPERADMIN')->prefix('admin')->name('admin.')->g
         Route::get('/update/{id}', [TypeController::class, 'update'])->name('update');
         Route::post('/update/{id}', [TypeController::class, 'doUpdate'])->name('doUpdate');
         Route::delete('/delete/{id}', [TypeController::class, 'delete'])->name('delete');
+    });
+
+    Route::prefix('departments')->name('departments.')->group(function () {
+        Route::get('/', [DepartmentController::class, 'index'])->name('index');
+        Route::get('/add', [DepartmentController::class, 'add'])->name('add');
+        Route::post('/create', [DepartmentController::class, 'doCreate'])->name('create');
+        Route::get('/update/{id}', [DepartmentController::class, 'update'])->name('update');
+        Route::post('/update/{id}', [DepartmentController::class, 'doUpdate'])->name('doUpdate');
+        Route::delete('/delete/{id}', [DepartmentController::class, 'delete'])->name('delete');
     });
 
     Route::prefix('categories')->name('categories.')->group(function () {

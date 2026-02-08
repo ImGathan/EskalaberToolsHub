@@ -51,12 +51,13 @@ class LoanController extends Controller
 
         $countOnLoan = Loan::whereHas('tool.category.toolsman', function($query) use ($userId) {
             $query->where('toolsman_id', $userId);
-        })->where('status', 'approve')->orWhere('status', 'returning')->count();
+        })->whereIn('status', ['approve', 'returning'])->count();
         
         $countReject = Loan::whereHas('tool.category.toolsman', function($query) use ($userId) {
             $query->where('toolsman_id', $userId);
         })->where('status', 'reject')->count();
 
+        
         return view('_toolsman.loan.index', compact('loans', 'countPending', 'countOnLoan', 'countReject'));
     }
 

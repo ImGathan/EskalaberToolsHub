@@ -48,7 +48,7 @@ use App\Constants\UserConst;
                         </a>
                     </li>
 
-                    <li class="hs-accordion {{ request()->routeIs('admin.users.*') || request()->routeIs('admin.tools.*') || request()->routeIs('admin.categories.*') || request()->routeIs('admin.places.*') ? 'active' : '' }}"
+                    <li class="hs-accordion {{ request()->routeIs('admin.tools.*') || request()->routeIs('admin.categories.*') || request()->routeIs('admin.places.*') || request()->routeIs('admin.places.*') || request()->routeIs('admin.types.*') || request()->routeIs('admin.departments.*') ? 'active' : '' }}"
                         id="projects-accordion">
                         <button type="button"
                             class="hs-accordion-toggle w-full text-start flex items-center gap-x-3.5  py-2.5 px-3 text-sm text-gray-800 rounded-lg hover:bg-gray-100 focus:outline-hidden focus:bg-gray-100 dark:bg-neutral-800 dark:hover:bg-neutral-700 dark:focus:bg-neutral-700 dark:text-neutral-200 cursor-pointer font-semibold"
@@ -62,7 +62,7 @@ use App\Constants\UserConst;
                         </button>
 
                         <div id="projects-accordion-child"
-                            class="hs-accordion-content w-full overflow-hidden transition-[height] duration-300 {{ request()->routeIs('admin.users.*') || request()->routeIs('admin.task_categories.*') || request()->routeIs('admin.tools.*') || request()->routeIs('admin.categories.*') || request()->routeIs('admin.places.*') || request()->routeIs('admin.types.*') ? 'block' : 'hidden' }}"
+                            class="hs-accordion-content w-full overflow-hidden transition-[height] duration-300 {{ request()->routeIs('admin.task_categories.*') || request()->routeIs('admin.tools.*') || request()->routeIs('admin.categories.*') || request()->routeIs('admin.places.*') || request()->routeIs('admin.types.*') || request()->routeIs('admin.departments.*') ? 'block' : 'hidden' }}"
                             role="region" aria-labelledby="projects-accordion">
                             <ul class="ps-8 pt-1 space-y-1">
                                 <li>
@@ -75,18 +75,18 @@ use App\Constants\UserConst;
                                 </li>
                                 <li>
                                     <a navigate
-                                        class="flex items-center gap-x-3.5  py-2.5 px-3 text-sm rounded-lg hover:bg-gray-100 focus:outline-hidden focus:bg-gray-100 dark:hover:bg-neutral-700 dark:focus:bg-neutral-700 {{ request()->routeIs('admin.places.*') ? 'bg-blue-100 text-blue-600 dark:bg-neutral-700 dark:text-blue-400' : 'text-gray-800 dark:text-neutral-200' }}"
-                                        href="{{ route('admin.places.index') }}">
-                                        @include('_admin._layout.icons.sidebar.place')
-                                        Lokasi Barang
-                                    </a>
-                                </li>
-                                <li>
-                                    <a navigate
                                         class="flex items-center gap-x-3.5  py-2.5 px-3 text-sm rounded-lg hover:bg-gray-100 focus:outline-hidden focus:bg-gray-100 dark:hover:bg-neutral-700 dark:focus:bg-neutral-700 {{ request()->routeIs('admin.types.*') ? 'bg-blue-100 text-blue-600 dark:bg-neutral-700 dark:text-blue-400' : 'text-gray-800 dark:text-neutral-200' }}"
                                         href="{{ route('admin.types.index') }}">
                                         @include('_admin._layout.icons.sidebar.type')
                                         Jenis Barang
+                                    </a>
+                                </li>
+                                <li>
+                                    <a navigate
+                                        class="flex items-center gap-x-3.5  py-2.5 px-3 text-sm rounded-lg hover:bg-gray-100 focus:outline-hidden focus:bg-gray-100 dark:hover:bg-neutral-700 dark:focus:bg-neutral-700 {{ request()->routeIs('admin.places.*') ? 'bg-blue-100 text-blue-600 dark:bg-neutral-700 dark:text-blue-400' : 'text-gray-800 dark:text-neutral-200' }}"
+                                        href="{{ route('admin.places.index') }}">
+                                        @include('_admin._layout.icons.sidebar.place')
+                                        Lokasi Barang
                                     </a>
                                 </li>
                                 <li>
@@ -97,19 +97,62 @@ use App\Constants\UserConst;
                                         Barang
                                     </a>
                                 </li>
+                                <li>
+                                    <a navigate
+                                        class="flex items-center gap-x-3.5  py-2.5 px-3 text-sm rounded-lg hover:bg-gray-100 focus:outline-hidden focus:bg-gray-100 dark:hover:bg-neutral-700 dark:focus:bg-neutral-700 {{ request()->routeIs('admin.departments.*') ? 'bg-blue-100 text-blue-600 dark:bg-neutral-700 dark:text-blue-400' : 'text-gray-800 dark:text-neutral-200' }}"
+                                        href="{{ route('admin.departments.index') }}">
+                                        @include('_admin._layout.icons.sidebar.department')
+                                        Jurusan/Unit
+                                    </a>
+                                </li>
                                 
+                            </ul>
+                        </div>
+
+
+                        
+                    </li>
+
+
+                    <li class="hs-accordion {{ request()->routeIs('admin.users.*') || request()->routeIs('admin.toolsmans.*') ? 'active' : '' }}"
+                        id="projects-accordion">
+                        <button type="button"
+                            class="hs-accordion-toggle w-full text-start flex items-center gap-x-3.5  py-2.5 px-3 text-sm text-gray-800 rounded-lg hover:bg-gray-100 focus:outline-hidden focus:bg-gray-100 dark:bg-neutral-800 dark:hover:bg-neutral-700 dark:focus:bg-neutral-700 dark:text-neutral-200 cursor-pointer font-semibold"
+                            aria-expanded="true" aria-controls="projects-accordion-child">
+                            @include('_admin._layout.icons.sidebar.member')
+                            Data Keanggotaan
+
+                            @include('_admin._layout.icons.sidebar.chevron_down')
+
+                            @include('_admin._layout.icons.sidebar.chevron_up')
+                        </button>
+
+                        <div id="projects-accordion-child"
+                            class="hs-accordion-content w-full overflow-hidden transition-[height] duration-300 {{ request()->routeIs('admin.users.*') || request()->routeIs('admin.toolsmans.*') ? 'block' : 'hidden' }}"
+                            role="region" aria-labelledby="projects-accordion">
+                            <ul class="ps-8 pt-1 space-y-1">
+
+                                <li>
+                                    <a navigate
+                                        class="flex items-center gap-x-3.5  py-2.5 px-3 text-sm rounded-lg hover:bg-gray-100 focus:outline-hidden focus:bg-gray-100 dark:hover:bg-neutral-700 dark:focus:bg-neutral-700 {{ request()->routeIs('admin.toolsmans.*') ? 'bg-blue-100 text-blue-600 dark:bg-neutral-700 dark:text-blue-400' : 'text-gray-800 dark:text-neutral-200' }}"
+                                        href="{{ route('admin.toolsmans.index') }}">
+                                        @include('_admin._layout.icons.sidebar.toolsman')
+                                        Toolsman
+                                    </a>
+                                </li>
                                 <li>
                                     <a navigate
                                         class="flex items-center gap-x-3.5  py-2.5 px-3 text-sm rounded-lg hover:bg-gray-100 focus:outline-hidden focus:bg-gray-100 dark:hover:bg-neutral-700 dark:focus:bg-neutral-700 {{ request()->routeIs('admin.users.*') ? 'bg-blue-100 text-blue-600 dark:bg-neutral-700 dark:text-blue-400' : 'text-gray-800 dark:text-neutral-200' }}"
                                         href="{{ route('admin.users.index') }}">
                                         @include('_admin._layout.icons.sidebar.user')
-                                        Pengguna Aplikasi
+                                        Pengguna
                                     </a>
                                 </li>
+
                             </ul>
                         </div>
                     </li>
-
+                    
                     {{-- <li><a class="w-full flex items-center gap-x-3.5  py-2.5 px-3 {{ request()->routeIs('admin.users.*') ? 'bg-gray-100 dark:bg-neutral-700' : '' }} text-sm text-gray-800 rounded-lg hover:bg-gray-100 focus:outline-hidden focus:bg-gray-100 dark:hover:bg-neutral-700 dark:focus:bg-neutral-700 dark:text-neutral-200"
                     href="{{ route('admin.users.index') }}">
                     <svg class="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24"

@@ -5,10 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Constants\ResponseConst;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ChangePasswordRequest;
-use App\Http\Requests\Admin\StoreUserRequest;
-use App\Http\Requests\Admin\UpdateUserRequest;
+use App\Http\Requests\Admin\StoreToolsmanRequest;
+use App\Http\Requests\Admin\UpdateToolsmanRequest;
 use App\Models\User;
-use App\Models\Department;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -16,11 +15,11 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
-class UserController extends Controller
+class ToolsmanController extends Controller
 {
     protected array $page = [
-        'route' => 'user',
-        'title' => 'Pengguna Aplikasi',
+        'route' => 'toolsman',
+        'title' => 'Toolsman',
     ];
 
     protected string $baseRedirect;
@@ -36,45 +35,39 @@ class UserController extends Controller
             ->when($request->get('keywords'), function ($query, $keywords) {
                 return $query->where('username', 'like', '%'.$keywords.'%');
             })
-            ->where('access_type', 3)
+            ->where('access_type', 2)
             ->orderBy('created_at', 'desc');
 
         $data = $query->paginate(10)->withQueryString();
-        $departments = Department::all();
 
-        return view('_admin.users.index', [
+        return view('_admin.toolsman.index', [
             'data' => $data,
             'page' => $this->page,
             'keywords' => $request->get('keywords'),
             'access_type' => $request->get('access_type'),
-            'departments' => $departments,
         ]);
     }
 
     public function add(): View|Response
     {
-        $departments = Department::all();
-        return view('_admin.users.add', [
+        return view('_admin.toolsman.add', [
             'page' => $this->page,
-            'departments' => $departments,
         ]);
     }
 
-    public function doCreate(StoreUserRequest $request)
+    public function doCreate(StoreToolsmanRequest $request)
     {
 
         User::create([
             'username'      => $request->username,
-            'department_id' => $request->department_id,
-            'years_in'      => $request->years_in, 
-            'class'         => null,
-            'access_type'   => 3,
+            'class'         => "Toolsman",
+            'access_type'   => 2,
             'password'      => bcrypt('default'),
             'is_active'     => 1,
             'created_by'    => auth()->id(),
         ]);
 
-        return redirect()->route('admin.users.index')->with('success', 'User berhasil disimpan!');
+        return redirect()->route('admin.toolsmans.index')->with('success', 'User berhasil disimpan!');
     }
 
     public function detail(int $id): View|RedirectResponse|Response
@@ -87,7 +80,7 @@ class UserController extends Controller
                 ->with('error', ResponseConst::DEFAULT_ERROR_MESSAGE);
         }
 
-        return view('_admin.users.detail', [
+        return view('_admin.toolsman.detail', [
             'data' => $user,
             'page' => $this->page,
         ]);
@@ -103,17 +96,14 @@ class UserController extends Controller
                 ->with('error', ResponseConst::DEFAULT_ERROR_MESSAGE);
         }
 
-        $departments = Department::all();
-
-        return view('_admin.users.update', [
+        return view('_admin.toolsman.update', [
             'data' => $user,
             'userId' => $id,
             'page' => $this->page,
-            'departments' => $departments,
         ]);
     }
 
-    public function doUpdate(int $id, UpdateUserRequest $request): RedirectResponse
+    public function doUpdate(int $id, UpdateToolsmanRequest $request): RedirectResponse
     {
         $user = User::find($id);
 
@@ -125,15 +115,13 @@ class UserController extends Controller
 
         $user->update([
             'username' => $request->username,
-            'department_id' => $request->department_id,
-            'years_in' => $request->years_in,
-            'class' => null,
-            'access_type' => 3,
+            'class' => "Toolsman",
+            'access_type' => 2,
             'updated_by' => Auth::id(),
         ]);
 
         return redirect()
-            ->route('admin.users.index')
+            ->route('admin.toolsmans.index')
             ->with('success', ResponseConst::SUCCESS_MESSAGE_UPDATED);
     }
 
@@ -143,7 +131,7 @@ class UserController extends Controller
 
         if (! $user) {
             return redirect()
-                ->route('admin.users.index')
+                ->route('admin.toolsmans.index')
                 ->with('error', ResponseConst::DEFAULT_ERROR_MESSAGE);
         }
 
@@ -154,14 +142,14 @@ class UserController extends Controller
 
         if ($isUsed) {
             return redirect()
-                ->route('admin.users.index')
+                ->route('admin.toolsmans.index')
                 ->with('error', ResponseConst::ERROR_MESSAGE_USER_USED);
         }
 
         $user->delete($id);
 
         return redirect()
-            ->route('admin.users.index')
+            ->route('admin.toolsmans.index')
             ->with('success', ResponseConst::SUCCESS_MESSAGE_DELETED);
     }
 
@@ -171,7 +159,7 @@ class UserController extends Controller
 
         if (! $user) {
             return redirect()
-                ->route('admin.users.index')
+                ->route('admin.toolsmans.index')
                 ->with('error', ResponseConst::DEFAULT_ERROR_MESSAGE);
         }
 
@@ -182,25 +170,8 @@ class UserController extends Controller
         ]);
 
         return redirect()
-            ->route('admin.users.index')
+            ->route('admin.toolsmans.index')
             ->with('success', 'Password berhasil direset menjadi default');
     }
 
-    public function changePassword(): View
-    {
-        return view('_admin.profile.change_password');
-    }
-
-    public function doChangePassword(ChangePasswordRequest $request): RedirectResponse
-    {
-        User::where('id', Auth::id())->update([
-            'password' => Hash::make($request->password),
-            'updated_by' => Auth::id(),
-            'updated_at' => now(),
-        ]);
-
-        return redirect()
-            ->back()
-            ->with('success', 'Password berhasil diubah.');
-    }
 }

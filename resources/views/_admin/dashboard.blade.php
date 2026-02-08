@@ -126,63 +126,88 @@
 
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script>
+    // 1. Fungsi utama untuk memicu perenderan (Struktur Admin)
     const initDashboardCharts = () => {
-        // --- 1. Inisialisasi Chart Tren ---
-        const trendEl = document.querySelector("#admin-trend-chart");
-        if (trendEl) {
-            trendEl.innerHTML = ''; // Penting untuk cegah lag/bug
-            new ApexCharts(trendEl, {
-                chart: { height: 320, type: 'area', toolbar: { show: false } },
-                series: [{ name: 'Pinjaman', data: @json($chartData) }],
-                xaxis: { categories: @json($chartLabels) },
-                colors: ['#3b82f6'],
-                stroke: { curve: 'smooth', width: 3 },
-                dataLabels: { enabled: false },
-                fill: { type: 'gradient', gradient: { opacityFrom: 0.4, opacityTo: 0.1 } }
-            }).render();
-        }
+        const trendElement = document.querySelector("#admin-trend-chart");
+        const categoryElement = document.querySelector("#admin-bar-chart");
 
-        // --- 2. Inisialisasi Chart Kategori ---
-        const barEl = document.querySelector("#admin-bar-chart");
-        if (barEl) {
-            barEl.innerHTML = '';
-            new ApexCharts(barEl, {
-                chart: { height: 320, type: 'bar', toolbar: { show: false } },
-                series: [{ 
-                    name: 'Total Dipinjam', // Ubah nama series agar lebih jelas
-                    data: @json($kategoriData ?? []) 
-                }],
-                xaxis: { categories: @json($kategoriLabels ?? []) },
-                tooltip: {
-                    y: {
-                        formatter: function (val) {
-                            return val + " Kali Dipinjam"
-                        }
-                    }
-                },
-                plotOptions: { bar: { borderRadius: 4, distributed: true, columnWidth: '50%' } },
-                colors: ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#6366f1'],
-                legend: { show: false }
-            }).render();
+        if (trendElement && trendElement.innerHTML === '') {
+            renderTrendChart(trendElement);
+        }
+        if (categoryElement && categoryElement.innerHTML === '') {
+            renderCategoryChart(categoryElement);
         }
     };
 
-    if (window.chartWatcher) clearInterval(window.chartWatcher);
+    // 2. Fungsi Render Trend - DISAMAKAN DENGAN STYLE USER (Tanpa label/titik)
+    function renderTrendChart(el) {
+        new ApexCharts(el, {
+            chart: { 
+                height: 320, 
+                type: 'area', 
+                toolbar: { show: false } 
+            },
+            series: [{ 
+                name: 'Pinjaman Anda', 
+                data: @json($chartData ?? []) 
+            }],
+            xaxis: { 
+                categories: @json($chartLabels ?? []) 
+            },
+            stroke: { 
+                curve: 'smooth', 
+                width: 3 
+            },
+            colors: ['#3b82f6'],
+            fill: { 
+                type: 'gradient', 
+                gradient: { 
+                    opacityFrom: 0.4, 
+                    opacityTo: 0.1 
+                } 
+            },
+            // Style User tidak pakai grid solid/markers/dataLabels di kodenya
+        }).render();
+    }
 
-    window.chartWatcher = setInterval(() => {
+    // 3. Fungsi Render Kategori - DISAMAKAN DENGAN STYLE USER
+    function renderCategoryChart(el) {
+        new ApexCharts(el, {
+            chart: { 
+                height: 320, 
+                type: 'bar', 
+                toolbar: { show: false } 
+            },
+            series: [{ 
+                name: 'Total Dipinjam', 
+                data: @json($kategoriData ?? []) 
+            }],
+            xaxis: { 
+                categories: @json($kategoriLabels ?? []) 
+            },
+            plotOptions: { 
+                bar: { 
+                    borderRadius: 4, 
+                    distributed: true 
+                } 
+            },
+            colors: ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6']
+        }).render();
+    }
+
+    // 4. SISTEM PENGAMAT OTOMATIS (MutationObserver)
+    const observer = new MutationObserver((mutations) => {
         const trendElem = document.querySelector("#admin-trend-chart");
-        const barElem = document.querySelector("#admin-bar-chart");
-
-        // Jika elemen ada di layar tapi isinya masih kosong (belum digambar)
-        if (trendElem && trendElem.innerHTML === '') {
-            console.log("Admin Chart: Menggambar ulang...");
+        if (trendElem) {
             initDashboardCharts();
         }
-    }, 500); // Cek setiap 0.5 detik
+    });
 
-    // Tetap jaga-jaga dengan event standar
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    // 5. EVENT LISTENERS
     document.addEventListener("turbo:load", initDashboardCharts);
     document.addEventListener("livewire:navigated", initDashboardCharts);
-
+    document.addEventListener("DOMContentLoaded", initDashboardCharts);
 </script>
 @endsection

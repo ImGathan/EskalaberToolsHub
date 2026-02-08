@@ -37,16 +37,48 @@
                     @enderror
                 </div>
 
-                <div class="mb-4">
-                    <label for="class" class="block text-sm font-medium mb-2 dark:text-white">Kelas/Posisi <span
-                            class="text-red-500">*</span></label>
-                    <input type="text" id="class" name="class" value="{{ $data->class ?? '' }}"
-                        class="py-2.5 sm:py-3 px-4 block w-full border-gray-200 rounded-lg sm:text-sm focus:border-blue-500 focus:ring-blue-500 placeholder-neutral-300 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600 @error('class') border-red-500 @enderror"
-                        placeholder="Contoh: 12 RPL 1/Guru" required>
-                    @error('class')
+                {{-- Department --}}
+                    <div class="mb-4">
+                        <label for="department_id" class="block text-sm font-medium mb-2 dark:text-white">Jurusan/Unit <span
+                                class="text-red-500">*</span></label>
+                        <select id="department_id" name="department_id"
+                            class="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600 @error('department_id') border-red-500 focus:border-red-500 focus:ring-red-500 @enderror"
+                            required>
+                            <option value="">-- Pilih Jurusan/Unit --</option>
+                            @foreach ($departments as $department)
+                            <option value="{{ $department->id }}" data-name="{{ $department->name }}"
+                                {{ $data->department_id == $department->id ? 'selected' : '' }}>
+                                {{ $department->name }}
+                            </option>
+                            @endforeach
+                        </select>
+                        @error('department_id')
                         <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
+                        @enderror
+                    </div>
+
+                    @php
+                        $currentYear = date('Y');
+                        $currentMonth = date('n');
+                        $maxYear = ($currentMonth >= 7) ? $currentYear : $currentYear - 1;
+                        $minYear = $maxYear - 2; 
+                    @endphp
+                    <div id="container_years_in" style="display: none;">
+                        <label for="years_in" class="block text-sm font-medium mb-2 dark:text-white">Tahun Masuk <span class="text-red-500">*</span></label>
+                        <input type="number"
+                            min="{{ $minYear }}"
+                            max="{{ $maxYear }}"
+                            id="years_in" 
+                            name="years_in" 
+                            value="{{ $data->years_in }}"
+                            {{-- Trik agar tidak bisa input lebih dari 4 digit --}}
+                            oninput="if(this.value.length > 4) this.value = this.value.slice(0, 4);"
+                            class="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 @error('years_in') border-red-500 @enderror"
+                            placeholder="Contoh: 2024">   
+                        @error('years_in')
+                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
 
                 <!-- <div class="mb-4">
                     <label for="email" class="block text-sm font-medium mb-2 dark:text-white">Email <span
@@ -58,22 +90,6 @@
                         <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                     @enderror
                 </div> -->
-
-                <div class="mb-4">
-                    <label for="access_type" class="block text-sm font-medium mb-2 dark:text-white">Access Type <span
-                            class="text-red-500">*</span></label>
-                    <select id="access_type" name="access_type"
-                        class="py-2.5 sm:py-3 px-4 block w-full border-gray-200 rounded-lg sm:text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600 @error('access_type') border-red-500 @enderror"
-                        required>
-                        <option value="">-- Select Access Type --</option>
-                        <option value="1" {{ ($data->access_type ?? '') == '1' ? 'selected' : '' }}>Superadmin</option>
-                        <option value="2" {{ ($data->access_type ?? '') == '2' ? 'selected' : '' }}>Toolsman</option>
-                        <option value="3" {{ ($data->access_type ?? '') == '3' ? 'selected' : '' }}>User</option>
-                    </select>
-                    @error('access_type')
-                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
 
                 <div class="flex justify-start gap-x-2 mt-4">
                     <a navigate href="{{ route('admin.users.index') }}"
@@ -95,4 +111,51 @@
             </form>
         </div>
     </div>
+    
+    <script>
+        function initYearToggle() {
+            const deptSelect = document.getElementById('department_id');
+            const yearContainer = document.getElementById('container_years_in');
+            const yearInput = document.getElementById('years_in');
+
+            if (!deptSelect || !yearContainer) return;
+
+            function toggleYearInput() {
+                const selectedOption = deptSelect.options[deptSelect.selectedIndex];
+                const deptName = selectedOption ? selectedOption.getAttribute('data-name') : '';
+
+                if (deptName && deptName !== 'Tenaga Pendidik/Karyawan') {
+                    yearContainer.style.display = 'block';
+                    yearInput.setAttribute('required', 'required');
+                } else {
+                    yearContainer.style.display = 'none';
+                    yearInput.removeAttribute('required');
+                    yearInput.value = '';
+                }
+            }
+
+            // Hapus listener lama biar gak tumpang tindih
+            deptSelect.removeEventListener('change', toggleYearInput);
+            deptSelect.addEventListener('change', toggleYearInput);
+            
+            // Jalankan sekali saat inisialisasi
+            toggleYearInput();
+        }
+
+        // 1. Handle Navigasi SPA (Livewire/Turbo)
+        document.addEventListener("turbo:load", initYearToggle);
+        document.addEventListener("livewire:navigated", initYearToggle);
+        document.addEventListener("DOMContentLoaded", initYearToggle);
+
+        // 2. Satpam Pintar (MutationObserver) - Pengganti setInterval
+        const observer = new MutationObserver((mutations) => {
+            if (document.getElementById('department_id')) {
+                initYearToggle();
+            }
+        });
+
+        observer.observe(document.body, { childList: true, subtree: true });
+    </script>
+
+
 @endsection

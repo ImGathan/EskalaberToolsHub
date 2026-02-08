@@ -87,62 +87,65 @@
 
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script>
-    const initDashboardCharts = () => {
+    const initToolsmanCharts = () => {
         const trendElement = document.querySelector("#hs-toolsman-trend-chart");
-        if (trendElement) {
-            trendElement.innerHTML = ''; // Penting: Hapus sisa render sebelumnya
+        const barElement = document.querySelector("#hs-toolsman-bar-chart");
+
+        // 1. Trend Chart dengan Angka Mengapung
+        if (trendElement && trendElement.innerHTML === '') {
             new ApexCharts(trendElement, {
-                chart: {
-                    height: 300,
-                    type: 'area',
-                    toolbar: { show: false },
-                    animations: { enabled: true }
+                chart: { height: 320, type: 'area', toolbar: { show: false } },
+                series: [{ name: 'Aktivitas', data: @json($chartData ?? []) }],
+                xaxis: { categories: @json($chartLabels ?? []) },
+                stroke: { curve: 'smooth', width: 3 },
+                // --- INI BAGIAN ANGKA MENGAPUNG ---
+                dataLabels: { 
+                    enabled: true, 
+                    style: { colors: ['#3b82f6'] },
+                    background: { enabled: true, padding: 4, borderRadius: 2, borderWidth: 0, opacity: 0.9 }
                 },
-                series: [{ 
-                    name: 'Total Aktivitas', 
-                    data: @json($chartData) 
-                }],
+                // ----------------------------------
                 colors: ['#3b82f6'],
-                fill: {
-                    type: 'gradient',
-                    gradient: { opacityFrom: 0.4, opacityTo: 0.1 }
-                },
-                xaxis: { categories: @json($chartLabels) },
-                dataLabels: { enabled: false },
-                stroke: { curve: 'smooth', width: 3 }
+                fill: { type: 'gradient', gradient: { opacityFrom: 0.4, opacityTo: 0.1 } }
             }).render();
         }
-        
-        // Render Bar Chart Kategori (sama seperti sebelumnya, gunakan ID yang benar)
-        const barElement = document.querySelector("#hs-single-bar-chart");
-        if (barElement) {
-            barElement.innerHTML = '';
+
+        // 2. Bar Chart dengan Angka Mengapung
+        if (barElement && barElement.innerHTML === '') {
             new ApexCharts(barElement, {
-                chart: { height: 300, type: 'bar', toolbar: { show: false } },
-                series: [{ name: 'Jumlah Barang', data: @json($kategoriData) }],
-                xaxis: { categories: @json($kategoriLabels) },
-                plotOptions: { bar: { borderRadius: 4, distributed: true } },
-                colors: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#6366f1']
+                chart: { height: 320, type: 'bar', toolbar: { show: false } },
+                series: [{ name: 'Jumlah', data: @json($kategoriData ?? []) }],
+                xaxis: { categories: @json($kategoriLabels ?? []) },
+                // --- INI BAGIAN ANGKA MENGAPUNG DI BAR ---
+                dataLabels: { 
+                    enabled: true,
+                    offsetY: -20, // Angka naik ke atas bar
+                    style: { fontSize: '12px', colors: ["#304758"] }
+                },
+                plotOptions: { 
+                    bar: { 
+                        borderRadius: 4, 
+                        distributed: true,
+                        dataLabels: { position: 'top' } // Pastikan posisi di atas
+                    } 
+                },
+                // -----------------------------------------
+                colors: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6']
             }).render();
         }
     };
 
-    // Hapus pemanggilan manual yang lama, ganti dengan "Satpam Chart" ini:
-    if (window.chartWatcher) clearInterval(window.chartWatcher);
-
-    window.chartWatcher = setInterval(() => {
-        const trendElem = document.querySelector("#hs-toolsman-trend-chart");
-
-        // Jika elemen ada di layar tapi isinya masih kosong (belum digambar)
-        if (trendElem && trendElem.innerHTML === '') {
-            console.log("Satpam Chart: Menggambar ulang...");
-            initDashboardCharts();
+    // Observer tetap sama (Sistem Pengamat)
+    const toolsmanObserver = new MutationObserver((mutations) => {
+        if (document.querySelector("#hs-toolsman-trend-chart")?.innerHTML === '') {
+            initToolsmanCharts();
         }
-    }, 500); // Cek setiap 0.5 detik
+    });
 
-    // Tetap jaga-jaga dengan event standar
-    document.addEventListener("turbo:load", initDashboardCharts);
-    document.addEventListener("livewire:navigated", initDashboardCharts);
+    toolsmanObserver.observe(document.body, { childList: true, subtree: true });
 
+    document.addEventListener("turbo:load", initToolsmanCharts);
+    document.addEventListener("livewire:navigated", initToolsmanCharts);
+    document.addEventListener("DOMContentLoaded", initToolsmanCharts);
 </script>
 @endsection

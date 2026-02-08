@@ -1,6 +1,6 @@
 @extends('_admin._layout.app')
 
-@section('title', 'Pengguna Aplikasi')
+@section('title', 'Toolsman')
 
 @php
     use App\Constants\UserConst;
@@ -14,14 +14,14 @@
             Data {{ $page['title'] }}
         </h1>
         <p class="text-md text-gray-400 dark:text-neutral-400">
-            Kelola informasi dan hak akses pengguna aplikasi.
+            Kelola informasi dan hak akses toolsman.
         </p>
     </div>
 
     <div>
         <a navigate
             class="py-2 px-4 inline-flex items-center gap-x-2 text-sm font-bolder rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none"
-            href="{{ route('admin.users.add') }}">
+            href="{{ route('admin.toolsmans.add') }}">
             @include('_admin._layout.icons.add')
             Tambah Data
         </a>
@@ -31,13 +31,13 @@
 <div class="flex flex-col">
     {{-- Search & Filter Section --}}
     <div class="px-2 pb-4">
-        <form action="{{ route('admin.users.index') }}" method="GET" navigate-form
+        <form action="{{ route('admin.toolsmans.index') }}" method="GET" navigate-form
             class="flex flex-col sm:flex-row gap-3">
             
             <div class="sm:w-64">
                 <input type="text" name="keywords" id="keywords" value="{{ $keywords ?? '' }}"
                     class="py-2 px-3 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400"
-                    placeholder="Cari nama pengguna...">
+                    placeholder="Cari nama toolsman...">
             </div>
 
             <div class="flex gap-x-2">
@@ -63,8 +63,7 @@
         <table class="min-w-full divide-y divide-gray-200 dark:divide-neutral-700">
             <thead class="bg-gray-50 dark:bg-neutral-800">
                 <tr>
-                    <th scope="col" class="px-6 py-3 text-start text-xs font-semibold uppercase text-gray-800 dark:text-neutral-200">Nama Pengguna</th>
-                    <th scope="col" class="px-6 py-3 text-start text-xs font-semibold uppercase text-gray-800 dark:text-neutral-200">Kelas/Posisi</th>
+                    <th scope="col" class="px-6 py-3 text-start text-xs font-semibold uppercase text-gray-800 dark:text-neutral-200">Nama Toolsman</th>
                     <th scope="col" class="px-6 py-3 text-start text-xs font-semibold uppercase text-gray-800 dark:text-neutral-200">Hak Akses</th>
                     <th scope="col" class="px-6 py-3 text-end text-xs font-semibold uppercase text-gray-800 dark:text-neutral-200">Aksi</th>
                 </tr>
@@ -81,9 +80,6 @@
                                 <span class="text-sm font-bold text-gray-800 dark:text-neutral-200">{{ $d->username }}</span>
                             </div>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-neutral-200">
-                            {{ $d->current_class }}
-                        </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span class="inline-flex items-center py-1 px-2.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-neutral-800 dark:text-neutral-300">
                                 {{ UserConst::getAccessTypes()[$d->access_type] ?? '-' }}
@@ -91,11 +87,11 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-end text-sm font-medium">
                             <div class="flex justify-end items-center gap-x-2">
-                                <a navigate href="{{ route('admin.users.detail', $d->id) }}" 
+                                <a navigate href="{{ route('admin.toolsmans.detail', $d->id) }}" 
                                     class="p-2 inline-flex items-center rounded-lg border border-gray-200 bg-white text-gray-800 hover:bg-gray-100 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300" title="View">
                                     @include('_admin._layout.icons.view_detail')
                                 </a>
-                                <a navigate href="{{ route('admin.users.update', $d->id) }}" 
+                                <a navigate href="{{ route('admin.toolsmans.update', $d->id) }}" 
                                     class="p-2 inline-flex items-center rounded-lg border border-blue-200 bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-500" title="Edit">
                                     @include('_admin._layout.icons.pencil')
                                 </a>
@@ -128,9 +124,9 @@
                 <span class="mb-4 inline-flex justify-center items-center size-14 rounded-full border-4 border-red-50 bg-red-100 text-red-500 dark:bg-red-700 dark:border-red-600 dark:text-red-100">
                     @include('_admin._layout.icons.warning_modal')
                 </span>
-                <h3 class="mb-2 text-xl font-bold text-gray-800 dark:text-neutral-200">Hapus Pengguna</h3>
+                <h3 class="mb-2 text-xl font-bold text-gray-800 dark:text-neutral-200">Hapus Toolsman</h3>
                 <p class="text-gray-500 dark:text-neutral-500">
-                    Apakah Anda yakin ingin menghapus <span id="delete-user-name" class="font-semibold text-gray-800 dark:text-neutral-200"></span>?<br>
+                    Apakah Anda yakin ingin menghapus <span id="delete-toolsman-name" class="font-semibold text-gray-800 dark:text-neutral-200"></span>?<br>
                     Tindakan ini tidak dapat dibatalkan.
                 </p>
 
@@ -153,8 +149,8 @@
 
 <script>
     function setDeleteData(id, username) {
-        document.getElementById('delete-user-name').textContent = username;
-        document.getElementById('delete-form').action = '{{ url("admin/users/delete") }}/' + id;
+        document.getElementById('delete-toolsman-name').textContent = username;
+        document.getElementById('delete-form').action = '{{ url("admin/toolsmans/delete") }}/' + id;
     }
 </script>
 @endsection

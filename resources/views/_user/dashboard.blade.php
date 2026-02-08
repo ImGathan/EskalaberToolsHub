@@ -88,91 +88,58 @@
 
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script>
+    // 1. Bungkus logika chart dalam satu fungsi bersih
     const initDashboardCharts = () => {
-        // --- 1. DATA DARI LARAVEL ---
-        const labelsPeminjaman = @json($chartLabels ?? []);
-        const dataPeminjaman = @json($chartData ?? []);
-        const labelsKategori = @json($kategoriLabels ?? []);
-        const dataKategori = @json($kategoriData ?? []);
-
-        // --- 2. LOGIKA GRAFIK TREN (Disamakan dengan Admin: Ada Gradient) ---
         const trendElement = document.querySelector("#hs-curved-area-line-chart");
-        if (trendElement) {
-            trendElement.innerHTML = ''; 
-            new ApexCharts(trendElement, {
-                chart: {
-                    height: 320, // Samakan tinggi dengan admin
-                    type: 'area',
-                    toolbar: { show: false },
-                    zoom: { enabled: false }
-                },
-                series: [{ name: 'Pinjaman Anda', data: dataPeminjaman }],
-                dataLabels: { enabled: false },
-                stroke: { curve: 'smooth', width: 3 },
-                colors: ['#3b82f6'],
-                xaxis: { categories: labelsPeminjaman },
-                fill: { 
-                    type: 'gradient', 
-                    gradient: { opacityFrom: 0.4, opacityTo: 0.1 } 
-                },
-                grid: { padding: { left: 0, right: 0 } }
-            }).render();
-        }
-
-        // --- 3. LOGIKA GRAFIK KATEGORI (Disamakan dengan Admin: Ada Tooltip) ---
         const categoryElement = document.querySelector("#hs-single-bar-chart");
-        if (categoryElement) {
-            categoryElement.innerHTML = ''; 
-            new ApexCharts(categoryElement, {
-                chart: {
-                    height: 320, // Samakan tinggi dengan admin
-                    type: 'bar',
-                    toolbar: { show: false }
-                },
-                plotOptions: {
-                    bar: {
-                        borderRadius: 4,
-                        columnWidth: '50%',
-                        distributed: true 
-                    }
-                },
-                series: [{ 
-                    name: 'Total Dipinjam', 
-                    data: dataKategori 
-                }],
-                tooltip: {
-                    y: {
-                        formatter: function (val) {
-                            return val + " Kali Anda Pinjam"
-                        }
-                    }
-                },
-                xaxis: { 
-                    categories: labelsKategori,
-                    labels: { style: { fontSize: '10px' } }
-                },
-                colors: ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6'],
-                legend: { show: false },
-                grid: { padding: { left: 0, right: 0 } }
-            }).render();
+
+        // Cek apakah elemen ada DAN belum pernah digambar (biar gak double)
+        if (trendElement && trendElement.innerHTML === '') {
+            renderTrendChart(trendElement);
+        }
+        if (categoryElement && categoryElement.innerHTML === '') {
+            renderCategoryChart(categoryElement);
         }
     };
 
-    if (window.chartWatcher) clearInterval(window.chartWatcher);
+    // Fungsi Render Terpisah agar kode rapi
+    function renderTrendChart(el) {
+        new ApexCharts(el, {
+            chart: { height: 320, type: 'area', toolbar: { show: false } },
+            series: [{ name: 'Pinjaman Anda', data: @json($chartData ?? []) }],
+            xaxis: { categories: @json($chartLabels ?? []) },
+            stroke: { curve: 'smooth', width: 3 },
+            colors: ['#3b82f6'],
+            fill: { type: 'gradient', gradient: { opacityFrom: 0.4, opacityTo: 0.1 } }
+        }).render();
+    }
 
-    window.chartWatcher = setInterval(() => {
+    function renderCategoryChart(el) {
+        new ApexCharts(el, {
+            chart: { height: 320, type: 'bar', toolbar: { show: false } },
+            series: [{ name: 'Total Dipinjam', data: @json($kategoriData ?? []) }],
+            xaxis: { categories: @json($kategoriLabels ?? []) },
+            plotOptions: { bar: { borderRadius: 4, distributed: true } },
+            colors: ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6']
+        }).render();
+    }
+
+    // 2. SISTEM PENGAMAT OTOMATIS (MutationObserver)
+    const observer = new MutationObserver((mutations, obs) => {
         const trendElem = document.querySelector("#hs-curved-area-line-chart");
-        const categoryElem = document.querySelector("#hs-single-bar-chart");
-
-        // Jika elemen ada di layar tapi isinya masih kosong (belum digambar)
-        if (trendElem && trendElem.innerHTML === '') {
-            console.log("Satpam Chart: Menggambar ulang...");
+        if (trendElem) {
             initDashboardCharts();
+            // Opsional: Jika chart sudah ketemu, kita bisa stop observasi di halaman ini
+            // obs.disconnect(); 
         }
-    }, 500); 
+    });
 
+    // Mulai mengamati perubahan di body
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    // 3. TETAP PAKAI EVENT NAVIGASI (Untuk jaga-jaga)
     document.addEventListener("turbo:load", initDashboardCharts);
     document.addEventListener("livewire:navigated", initDashboardCharts);
-    
+    document.addEventListener("DOMContentLoaded", initDashboardCharts);
 </script>
 @endsection

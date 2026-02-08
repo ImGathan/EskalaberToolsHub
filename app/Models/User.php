@@ -26,6 +26,8 @@ class User extends Authenticatable
         'created_by',
         'updated_by',
         'deleted_by',
+        'department_id',
+        'years_in',
     ];
 
     /**
@@ -51,4 +53,60 @@ class User extends Authenticatable
             'is_active' => 'boolean',
         ];
     }
+
+
+    public function department()
+    {
+        return $this->belongsTo(Department::class);
+    }
+
+
+    public function getCurrentClassAttribute()
+    {
+
+        if (!$this->years_in) {
+            return $this->class ?? 'Tenaga Pendidik/Karyawan';
+        }
+
+        $now = now();
+        $yearIn = (int) $this->years_in;
+        $diff = $now->year - $yearIn;
+        
+        $grade = ($now->month >= 7) ? ($diff + 10) : ($diff + 9);
+
+        if ($grade > 12) {
+            return 'Lulus'; 
+        }
+        
+        $deptName = $this->department ? $this->department->name : '';
+        return $grade . ' ' . $deptName;
+    }
+
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::retrieved(function ($user) {
+            if ($user->years_in) {
+                $realClass = $user->current_class; 
+
+                if ($realClass === 'Lulus') {
+                    $user->delete(); 
+                    return; 
+                }
+
+                if ($user->getOriginal('class') !== $realClass) {
+                    $user->class = $realClass;
+                    $user->saveQuietly(); 
+                }
+
+            }elseif (empty($user->class)) {
+                $user->class = 'Tenaga Pendidik/Karyawan';
+                $user->saveQuietly();
+            }
+        });
+    }
+
+
 }
