@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
+use Vinkla\Hashids\Facades\Hashids;
 
 class Loan extends Model
 {
@@ -186,6 +187,12 @@ class Loan extends Model
 
         // Hitung selisih hari ini dengan due_date
         return (int) abs(now()->diffInDays($this->due_date));
+    }
+
+    public function getHashIdAttribute()
+    {
+        $hashids = new \Hashids\Hashids('salt-kamu', 5);
+        return $hashids->encode($this->id);
     }
 
 }

@@ -61,7 +61,7 @@
 
     <!-- Content -->
     <div class="w-full lg:ps-64 bg-white dark:bg-neutral-900 min-h-screen">
-        <div id="main-content" class="p-2 2xl:px-25 px-3 md:px-8 pt-24 sm:p-6 space-y-4 sm:space-y-6">
+        <div id="main-content" class="p-2 2xl:px-25 px-3 md:px-8 pt-24 md:pt-24 lg:pt-6 sm:p-6 space-y-4 sm:space-y-6">
             @if (session('success'))
             <div id="spa-flash-success" style="display: none;">{{ session('success') }}</div>
             @endif

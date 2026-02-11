@@ -19,6 +19,7 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'username',
+        'email',
         'password',
         'class',
         'access_type',
@@ -58,6 +59,11 @@ class User extends Authenticatable
     public function department()
     {
         return $this->belongsTo(Department::class);
+    }
+
+    public function loans()
+    {
+        return $this->hasMany(Loan::class);
     }
 
 

@@ -17,6 +17,7 @@ class StoreToolsmanRequest extends FormRequest
 
         return [
             'username' => 'required|string|max:255|unique:users,username,'.$userId,
+            'email' => 'required|email|unique:users,email,'.$userId,
         ];
     }
 }

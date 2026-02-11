@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Loan;
 use App\Models\ActivityLog;
 use Illuminate\Support\Facades\Auth;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class FineController extends Controller
 {
@@ -30,18 +31,25 @@ class FineController extends Controller
         $countBelumBayar = (clone $baseQuery)->where('fine_status', 0)->count();
         $countLunas = (clone $baseQuery)->where('fine_status', 1)->count();
 
-        // 4. Ambil data dengan filter status tab dan pencarian
+        $keywords = $request->keywords;
+        
         $fineLoans = $baseQuery->where('fine_status', $status)
-            ->when($request->keywords, function($q) use ($request) {
-                $q->whereHas('user', function($u) use ($request) {
-                    $u->where('username', 'like', '%' . $request->keywords . '%');
+            ->when($keywords, function($query) use ($keywords) {
+                $query->where(function($q) use ($keywords) {
+                    $q->whereHas('user', function($userQuery) use ($keywords) {
+                        $userQuery->where('username', 'like', "%$keywords%");
+                    })
+                    ->orWhereHas('tool', function($toolQuery) use ($keywords) {
+                        $toolQuery->where('name', 'like', "%$keywords%");
+                    })
+                    ->orWhere('id', 'like', "%$keywords%");
                 });
             })
-            ->orderBy('updated_at', 'desc') // Biasanya lebih enak urut yang terbaru
+            ->orderBy('updated_at', 'desc')
             ->paginate(10)
-            ->withQueryString(); // Penting! Agar saat pindah halaman, filter tab tidak hilang
+            ->withQueryString();
 
-        return view('_toolsman.fine.index', compact('fineLoans', 'countBelumBayar', 'countLunas'));    
+        return view('_toolsman.fine.index', compact('fineLoans', 'countBelumBayar', 'countLunas', 'keywords'));    
     }
 
     public function pay($id)
@@ -58,12 +66,52 @@ class FineController extends Controller
         ]);
 
         $fineLoan->update([
+            'amount_paid' => $request->amount_paid,
             'fine_status' => true,
             'fine_paid_at' => now(),
         ]);
 
-        return redirect()->route('toolsman.fines.index')
-            ->with('success', 'Pembayaran denda berhasil!');
+        return redirect()->route('toolsman.fines.index', ['fine_status' => 1 ])->with('success', 'Pembayaran denda berhasil!');
+    }
+
+    public function downloadUnpaidReport($id)
+    {
+        $loan = Loan::with(['user', 'tool'])->findOrFail($id);
+
+        if ($loan->fine_status === 1) {
+            return back()->with('error', 'Peminjaman ini sudah lunas.');
+        }
+
+        $data = [
+            'title' => 'Laporan Denda Keterlambatan',
+            'date' => date('d/m/Y'),
+            'loan' => $loan
+        ];
+
+        $pdf = Pdf::loadView('_toolsman.fine.belum_bayar_report', $data)
+                ->setPaper('a4', 'portrait');
+
+        return $pdf->download('Laporan_Denda_Terlambat_' . $loan->user->username . '_' . date('Ymd') . '.pdf');
+    }
+
+    public function downloadPaidReport($id)
+    {
+        $loan = Loan::with(['user', 'tool'])->findOrFail($id);
+
+        if ($loan->fine_status === 0) {
+            return back()->with('error', 'Peminjaman ini belum lunas.');
+        }
+
+        $data = [
+            'title' => 'Laporan Denda Keterlambatan',
+            'date' => date('d/m/Y'),
+            'loan' => $loan
+        ];
+
+        $pdf = Pdf::loadView('_toolsman.fine.lunas_report', $data)
+                ->setPaper('a4', 'portrait');
+
+        return $pdf->download('Laporan_Pembayaran_Denda_' . $loan->user->username . '_' . date('Ymd') . '.pdf');
     }
 
 }

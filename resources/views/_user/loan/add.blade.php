@@ -117,8 +117,8 @@
                 </p>
 
                 <div class="mt-6 flex justify-center">
-                    <button type="button" class="py-2 px-10 text-sm font-medium rounded-lg bg-yellow-600 text-white hover:bg-yellow-700" data-hs-overlay="#duplicate-modal">
-                        Mengerti
+                    <button type="button" onclick="window.history.back()" class="py-2 px-10 text-sm font-medium rounded-lg bg-yellow-600 text-white hover:bg-yellow-700" data-hs-overlay="#duplicate-modal">
+                        Mengerti & Kembali
                     </button>
                 </div>
             </div>
@@ -147,7 +147,7 @@
     }
 
     // 2. Logika Pemicu Modal Otomatis (Tanpa DOMContentLoaded)
-    @if(session('error_duplicate'))
+    @if(session('error'))
         var modalElement = document.querySelector('#duplicate-modal');
         
         var openDuplicateModal = function() {

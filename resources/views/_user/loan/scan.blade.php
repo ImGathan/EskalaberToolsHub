@@ -27,11 +27,23 @@
                 </div>
             </div>
 
-            <div id="result" class="hidden mt-4 p-3 bg-emerald-100 dark:bg-emerald-500/20 border border-emerald-200 dark:border-emerald-500/30 rounded-xl text-center">
+            <!-- <div id="result" class="hidden mt-4 p-3 bg-emerald-100 dark:bg-emerald-500/20 border border-emerald-200 dark:border-emerald-500/30 rounded-xl text-center">
                 <span class="text-emerald-700 dark:text-emerald-400 text-xs font-bold flex items-center justify-center gap-2">
                     <svg class="size-4 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                     BERHASIL DIBACA! MENGALIHKAN...
                 </span>
+            </div> -->
+
+            <div id="success-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm">
+                <div class="bg-white dark:bg-neutral-800 rounded-2xl max-w-sm w-full p-6 text-center shadow-2xl scale-95 transition-transform duration-300" id="modal-content">
+                    <div class="size-20 bg-emerald-100 dark:bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg class="size-10 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 dark:text-white">QR Berhasil Terdeteksi!</h3>
+                    <p class="text-gray-500 dark:text-neutral-400 mt-2 text-sm">Data barang valid. Mengalihkan Anda ke halaman peminjaman...</p>
+                </div>
             </div>
 
             <div class="mt-8 flex justify-center gap-4">
@@ -70,6 +82,7 @@
     </div>
 </div>
 
+
 <style>
     /* Professional Scan Animation */
     @keyframes scanMove {
@@ -101,6 +114,34 @@
     window.isStarting = false;
     window.isFileScanning = false; // Flag baru untuk mengunci satpam saat scan file
 
+    const APP_SECRET_PREFIX = "SMKN-TOOLS-ID:"; 
+
+    async function handleDecodedText(text) {
+        // 1. Cek apakah QR ini milik aplikasi kita
+        if (!text.startsWith(APP_SECRET_PREFIX)) {
+            alert("Maaf, QR Code ini bukan milik sistem Manajemen Barang!");
+            return; 
+        }
+
+        // 2. Jika valid, ambil ID-nya saja (Contoh: SMKN-TOOLS-ID:10 -> Jadi 10)
+        const itemId = text.replace(APP_SECRET_PREFIX, "");
+        const finalUrl = `/user/loans/add?tool_id=${itemId}`; // Sesuaikan route kamu
+
+        // 3. Tampilkan Modal Berhasil
+        const modal = document.getElementById('success-modal');
+        const modalContent = document.getElementById('modal-content');
+        
+        modal.classList.remove('hidden');
+        setTimeout(() => modalContent.classList.remove('scale-95'), 10);
+
+        // 4. Stop Scanner & Redirect
+        await stopScanner();
+        
+        setTimeout(() => {
+            window.location.href = finalUrl;
+        }, 1500); // Beri jeda 1.5 detik agar user bisa lihat modalnya
+    }
+
     async function stopScanner() {
         if (window.scannerInstance) {
             try {
@@ -131,8 +172,7 @@
                 { facingMode: facingMode },
                 { fps: 10, qrbox: { width: 250, height: 250 } },
                 (text) => {
-                    document.getElementById('result').classList.remove('hidden');
-                    stopScanner().then(() => window.location.href = text);
+                    handleDecodedText(text);
                 }
             );
         } catch (err) {
@@ -147,22 +187,17 @@
         if (e.target.files.length === 0) return;
         const file = e.target.files[0];
         
-        // 1. Kunci satpam agar tidak menyalakan kamera otomatis
         window.isFileScanning = true;
         
-        // 2. Matikan kamera jika sedang menyala
         await stopScanner();
 
-        // 3. Buat instance sementara untuk scan file
         const fileScanner = new Html5Qrcode("reader");
 
         try {
             const text = await fileScanner.scanFile(file, true);
-            document.getElementById('result').classList.remove('hidden');
-            window.location.href = text;
+            handleDecodedText(text);
         } catch (err) {
-            alert("QR Code tidak ditemukan pada gambar ini.");
-            // 4. Jika gagal, bebaskan satpam agar kamera menyala lagi
+            alert("QR Code tidak ditemukan atau tidak valid.");
             window.isFileScanning = false;
         }
     });
@@ -192,5 +227,6 @@
     document.addEventListener("turbo:load", startScanner);
     document.addEventListener("turbo:before-visit", stopScanner);
     window.addEventListener('beforeunload', stopScanner);
+    
 </script>
 @endsection

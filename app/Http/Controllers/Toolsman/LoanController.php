@@ -33,10 +33,14 @@ class LoanController extends Controller
                 }
             })
             ->when($keywords, function($query) use ($keywords) {
-                $query->whereHas('user', function($q) use ($keywords) {
-                    $q->where('username', 'like', "%$keywords%");
-                })->orWhereHas('tool', function($q) use ($keywords) {
-                    $q->where('name', 'like', "%$keywords%");
+                $query->where(function($q) use ($keywords) {
+                    $q->whereHas('user', function($userQuery) use ($keywords) {
+                        $userQuery->where('username', 'like', "%$keywords%");
+                    })
+                    ->orWhereHas('tool', function($toolQuery) use ($keywords) {
+                        $toolQuery->where('name', 'like', "%$keywords%");
+                    })
+                    ->orWhere('id', 'like', "%$keywords%");
                 });
             })
             ->orderBy('loan_date', 'desc')
@@ -58,7 +62,17 @@ class LoanController extends Controller
         })->where('status', 'reject')->count();
 
         
-        return view('_toolsman.loan.index', compact('loans', 'countPending', 'countOnLoan', 'countReject'));
+        return view('_toolsman.loan.index', compact('keywords','loans', 'countPending', 'countOnLoan', 'countReject'));
+    }
+
+    public function detail($id) {
+        $userId = Auth::user()->id;
+        $data = Loan::with(['tool.category'])
+            ->whereHas('tool.category.toolsman', function($query) use ($userId) {
+                $query->where('toolsman_id', $userId);
+            })
+            ->findOrFail($id);
+        return view('_toolsman.loan.detail', compact('data'));
     }
 
     public function approve($id) 
@@ -86,7 +100,7 @@ class LoanController extends Controller
 
         ActivityLog::record( 'Penyetujuan Pinjaman', Auth::user()->username . ' menyetujui pinjaman oleh ' . $loan->user->username . ' yaitu ' . $loan->tool->name . ' sebanyak ' . $loan->quantity . ' unit.');
 
-        return back()->with('success', 'Peminjaman berhasil disetujui.');
+        return redirect()->route('toolsman.loans.index', ['status' => 'on_loan'])->with('success', 'Peminjaman berhasil disetujui.');
     }
 
     public function reject($id) 
@@ -98,7 +112,7 @@ class LoanController extends Controller
         });
 
         ActivityLog::record( 'Penolakan Pinjaman', Auth::user()->username . ' menolak pinjaman oleh ' . $loan->user->username . ' yaitu ' . $loan->tool->name . ' sebanyak ' . $loan->quantity . ' unit.');
-        return back()->with('success', 'Peminjaman berhasil ditolak.');
+        return redirect()->route('toolsman.loans.index', ['status' => 'history'])->with('success', 'Peminjaman berhasil ditolak.');
     }
 
     public function returned ($id) 
@@ -119,7 +133,7 @@ class LoanController extends Controller
         });
 
         ActivityLog::record( 'Pengembalian Pinjaman', Auth::user()->username . ' menyetujui pengembalian pinjaman oleh ' . $loan->user->username . ' yaitu ' . $loan->tool->name . ' sebanyak ' . $loan->quantity . ' unit.');
-        return back()->with('success', 'Peminjaman berhasil dikembalikan.');
+        return redirect()->route('toolsman.loans.index', ['status' => 'history'])->with('success', 'Peminjaman berhasil dikembalikan.');
     }
 
 
@@ -127,7 +141,6 @@ class LoanController extends Controller
     {
         $loan = Loan::with(['user', 'tool'])->findOrFail($id);
 
-        // Pastikan hanya bisa cetak jika terlambat
         if ($loan->fine_amount <= 0) {
             return back()->with('error', 'Peminjaman ini tidak memiliki riwayat keterlambatan.');
         }

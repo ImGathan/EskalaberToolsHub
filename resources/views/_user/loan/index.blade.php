@@ -90,7 +90,7 @@
                             
                             {{-- Floating ID Badge (Muncul di semua ukuran sekarang biar rapi) --}}
                             <div class="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/70 to-transparent">
-                                <span class="text-[10px] text-white/90 font-mono font-bold">#LOAN-{{ $loan->id }}</span>
+                                <span class="text-[10px] text-white/90 font-mono font-bold">#L-{{ $loan->hash_id }}</span>
                             </div>
                         </div>
 
@@ -154,7 +154,7 @@
                                 </div>
                                 <div class="flex flex-col sm:flex-row sm:items-center col-span-2 lg:col-span-1">
                                     <span class="text-[10px] sm:text-xs text-gray-400 dark:text-neutral-500 font-bold tracking-tight sm:mr-2">ID</span>
-                                    <span class="text-xs font-mono font-bold text-blue-600 dark:text-blue-400">#L-{{ $loan->id }}</span>
+                                    <span class="text-xs font-mono font-bold text-blue-600 dark:text-blue-400">#L-{{ $loan->hash_id }}</span>
                                 </div>
                             </div>
 

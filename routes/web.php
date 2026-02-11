@@ -18,6 +18,7 @@ use App\Http\Controllers\Toolsman\DashboardController as ToolsmanDashboardContro
 use App\Http\Controllers\User\UserController as UserUserController;
 use App\Http\Controllers\User\ToolController as UserToolController;
 use App\Http\Controllers\User\LoanController as UserLoanController;
+use App\Http\Controllers\User\FineController as UserFineController;
 use App\Http\Controllers\User\DashboardController as UserDashboardController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
@@ -124,6 +125,7 @@ Route::middleware('auth', 'role:TOOLSMAN')->prefix('toolsman')->name('toolsman.'
 
     Route::prefix('loans')->name('loans.')->group(function () {
         Route::get('/', [ToolsmanLoanController::class, 'index'])->name('index');
+        Route::get('/detail/{id}', [ToolsmanLoanController::class, 'detail'])->name('detail');
         Route::patch('/{id}/approve', [ToolsmanLoanController::class, 'approve'])->name('approve');
         Route::patch('/{id}/reject', [ToolsmanLoanController::class, 'reject'])->name('reject');
         Route::patch('/{id}/returned', [ToolsmanLoanController::class, 'returned'])->name('returned');
@@ -132,8 +134,10 @@ Route::middleware('auth', 'role:TOOLSMAN')->prefix('toolsman')->name('toolsman.'
 
     Route::prefix('fines')->name('fines.')->group(function () {
         Route::get('/', [ToolsmanFineController::class, 'index'])->name('index');
-        Route::get('/pay/{id}', [ToolsmanFineController::class, 'pay'])->name('pay');
+        Route::patch('/pay/{id}', [ToolsmanFineController::class, 'pay'])->name('pay');
         Route::patch('/paid/{id}', [ToolsmanFineController::class, 'paid'])->name('paid');
+        Route::get('/{id}/unpaid-report', [ToolsmanFineController::class, 'downloadUnpaidReport'])->name('unpaid-report');
+        Route::get('/{id}/paid-report', [ToolsmanFineController::class, 'downloadPaidReport'])->name('paid-report');
     });
 
     Route::prefix('profile')->name('profile.')->group(function () {
@@ -166,4 +170,10 @@ Route::middleware('auth', 'role:USER')->prefix('user')->name('user.')->group(fun
         Route::patch('/{id}/returning', [UserLoanController::class, 'returning'])->name('returning');
         Route::get('/scan', [UserLoanController::class, 'scan'])->name('scan');
     });
+
+    Route::prefix('fines')->name('fines.')->group(function () {
+        Route::get('/', [UserFineController::class, 'index'])->name('index');
+        Route::get('/pay/{id}', [UserFineController::class, 'pay'])->name('pay');
+    });
+    
 });

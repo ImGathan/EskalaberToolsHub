@@ -60,6 +60,7 @@ class ToolsmanController extends Controller
 
         User::create([
             'username'      => $request->username,
+            'email'         => $request->email,
             'class'         => "Toolsman",
             'access_type'   => 2,
             'password'      => bcrypt('default'),
@@ -115,6 +116,7 @@ class ToolsmanController extends Controller
 
         $user->update([
             'username' => $request->username,
+            'email' => $request->email,
             'class' => "Toolsman",
             'access_type' => 2,
             'updated_by' => Auth::id(),

@@ -100,7 +100,7 @@
                 stroke: { curve: 'smooth', width: 3 },
                 // --- INI BAGIAN ANGKA MENGAPUNG ---
                 dataLabels: { 
-                    enabled: true, 
+                    enabled: false, 
                     style: { colors: ['#3b82f6'] },
                     background: { enabled: true, padding: 4, borderRadius: 2, borderWidth: 0, opacity: 0.9 }
                 },

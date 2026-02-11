@@ -43,13 +43,15 @@
 <div class="flex flex-col">
     {{-- Search & Filter Section --}}
     <div class="px-2 pb-4">
-        <form action="{{ route('toolsman.tools.index') }}" method="GET" navigate-form
+        <form action="{{ route('toolsman.fines.index') }}" method="GET" navigate-form
             class="flex flex-col sm:flex-row gap-3">
             
+            <input type="hidden" name="fine_status" value="{{ request('fine_status', 0) }}">
+
             <div class="sm:w-80">
                 <input type="text" name="keywords" id="keywords" value="{{ $keywords ?? '' }}"
                     class="py-2 px-3 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400"
-                    placeholder="Cari nama pengguna...">
+                    placeholder="Cari nama barang atau pengguna...">
             </div>
 
             <div class="flex gap-x-2">
@@ -60,7 +62,7 @@
                 </button>
                 
                 @if (!empty($keywords))
-                    <a href="{{ route('toolsman.tools.index') }}"
+                    <a href="{{ route('toolsman.fines.index') }}"
                         class="py-2 px-3 inline-flex items-center gap-x-1 text-sm font-semibold rounded-lg border border-gray-200 bg-white text-gray-800 hover:bg-gray-50 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300">
                         @include('_toolsman._layout.icons.reset')
                         Reset
@@ -79,6 +81,12 @@
                     <th scope="col" class="px-6 py-3 text-start text-xs font-semibold uppercase text-gray-800 dark:text-neutral-200">Barang yang dipinjam</th>
                     <th scope="col" class="px-6 py-3 text-start text-xs font-semibold uppercase text-gray-800 dark:text-neutral-200">Hari Keterlambatan</th>
                     <th scope="col" class="px-6 py-3 text-start text-xs font-semibold uppercase text-gray-800 dark:text-neutral-200">Total Denda</th>
+                    @php
+                        $fineLoan = $fineLoans->first();
+                    @endphp
+                    @if ($fineLoan && $fineLoan->fine_status === 1)
+                        <th scope="col" class="px-6 py-3 text-start text-xs font-semibold uppercase text-gray-800 dark:text-neutral-200">Jumlah Bayar</th>
+                    @endif
                     <th scope="col" class="px-6 py-3 text-start text-xs font-semibold uppercase text-gray-800 dark:text-neutral-200">Status</th>
                     <th scope="col" class="px-6 py-3 text-end text-xs font-semibold uppercase text-gray-800 dark:text-neutral-200">Aksi</th>
                 </tr>
@@ -104,18 +112,62 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-neutral-200 font-bold">
                             Rp. {{ number_format($fineLoan->fine_amount, 0, ',', '.') }}
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-neutral-200 font-medium">
-                            @if($fineLoan->fine_status == 0)
-                                <span class="text-red-500">Belum Bayar</span>
-                            @elseif($fineLoan->fine_status == 1)
-                                <span class="text-green-500">Lunas</span>
-                            @endif
+                        @if ($fineLoan->fine_status === 1)
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-neutral-200 font-bold">
+                            Rp. {{ number_format($fineLoan->amount_paid, 0, ',', '.') }}
                         </td>
+                        @endif
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            @php
+                                $statusClasses = match($fineLoan->fine_status) {
+                                    1 => 'bg-teal-100 text-teal-800 dark:bg-teal-500/10 dark:text-teal-500',
+                                    0 => 'bg-red-100 text-red-500 dark:bg-red-500/10 dark:text-red-500',
+                                };
+                            @endphp
+                            <span class="inline-flex items-center py-1 px-2.5 rounded-full text-xs font-bold {{ $statusClasses }}">
+                                {{ $fineLoan->fine_status == 1 ? 'Lunas' : 'Belum Bayar' }}
+                            </span>
+                        </td>
+
                         <td class="px-6 py-4 whitespace-nowrap text-end text-sm font-medium">
-                            <a navigate href="{{ route('toolsman.fines.pay', $fineLoan->id) }}" 
-                                class="py-2 px-3 inline-flex items-center rounded-lg border-transparent bg-blue-100 text-blue-600 hover:bg-blue-200 dark:bg-blue-900/30 dark:text-blue-500 font-bold text-xs" title="View">
-                                Proses Bayar
-                            </a>
+                            <div class="flex justify-end items-center gap-x-2">
+
+                                @if($fineLoan->fine_status == 0)
+                                <form action="{{ route('toolsman.fines.pay', $fineLoan->id) }}" method="POST">
+                                        @csrf
+                                        @method('PATCH')
+                                        <button type="submit" 
+                                            class="py-1.5 px-3 inline-flex items-center gap-x-1 text-xs font-bold rounded-lg border border-transparent bg-blue-100 text-blue-600 hover:bg-blue-200 dark:bg-blue-900/30 dark:text-blue-500 cursor-pointer">
+                                            Proses Bayar
+                                        </button>
+                                    </form>
+                                @endif
+
+                                <div class="hs-dropdown relative inline-flex">
+                                    <button id="hs-dropdown-custom-icon-trigger" type="button" class="hs-dropdown-toggle p-2 inline-flex justify-center items-center gap-2 rounded-lg border border-gray-200 bg-white text-gray-400 shadow-sm hover:bg-gray-50 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-400 dark:hover:bg-neutral-700">
+                                        <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+                                    </button>
+
+                                    <div class="hs-dropdown-menu transition-[opacity,margin] duration hs-dropdown-open:opacity-100 opacity-0 hidden min-w-60 bg-white shadow-md rounded-lg p-2 mt-2 dark:bg-neutral-800 dark:border dark:border-neutral-700 dark:divide-neutral-700 z-30" aria-labelledby="hs-dropdown-custom-icon-trigger">
+                                        
+                                        @if($fineLoan->fine_status == 0)
+                                        <a href="{{ route('toolsman.fines.unpaid-report', $fineLoan->id) }}" class="flex items-center gap-x-3 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-neutral-300" href="#">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                                            Cetak Laporan Denda (PDF)
+                                        </a>
+                                        @endif
+
+                                        @if($fineLoan->fine_status == 1)
+                                        <a href="{{ route('toolsman.fines.paid-report', $fineLoan->id) }}" class="flex items-center gap-x-3 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-neutral-300" href="#">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                                            Cetak Laporan Pembayaran (PDF)
+                                        </a>
+                                        @endif
+                                        
+                                    </div>
+                                </div>
+
+                            </div>
                         </td>
                     </tr>
                 @empty

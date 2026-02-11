@@ -20,7 +20,7 @@ class AuthController extends Controller
     public function doLogin(Request $request)
     {
         $credentials = $request->validate([
-            'username' => ['required'],
+            'email' => ['required'],
             'password' => ['required'],
         ]);
 
@@ -32,7 +32,7 @@ class AuthController extends Controller
 
         return back()->withErrors([
             'login_error' => 'Username atau Password tidak sesuai, periksa kembali',
-        ])->onlyInput('username');
+        ])->onlyInput('email');
     }
 
     private function redirectByRole($user)

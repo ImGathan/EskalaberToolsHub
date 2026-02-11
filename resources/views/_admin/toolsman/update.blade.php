@@ -6,7 +6,7 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div class="bg-white overflow-hidden shadow-lg rounded-2xl dark:bg-neutral-800 border-2 border-gray-100">
             <div class="px-6 py-4 border-b border-gray-200 dark:border-neutral-700 flex items-center">
-                <a href="{{ route('admin.users.index') }}"
+                <a href="{{ route('admin.toolsmans.index') }}"
                     class="py-3 px-3 inline-flex items-center gap-x-2 text-xl rounded-xl border border-gray-200 bg-white text-gray-800 shadow-md hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-800 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-700 dark:focus:bg-neutral-700 cursor-pointer">
                     <svg class="shrink-0 size-5" xmlns="http://www.w3.org/2000/svg" width="90" height="90"
                         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -37,8 +37,7 @@
                     @enderror
                 </div>
 
-
-                <!-- <div class="mb-4">
+                <div class="mb-4">
                     <label for="email" class="block text-sm font-medium mb-2 dark:text-white">Email <span
                             class="text-red-500">*</span></label>
                     <input type="email" id="email" name="email" value="{{ $data->email ?? '' }}"
@@ -47,7 +46,7 @@
                     @error('email')
                         <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                     @enderror
-                </div> -->
+                </div>
 
                 <div class="flex justify-start gap-x-2 mt-4">
                     <a navigate href="{{ route('admin.toolsmans.index') }}"

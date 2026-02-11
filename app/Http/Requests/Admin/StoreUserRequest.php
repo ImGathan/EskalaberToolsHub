@@ -21,6 +21,7 @@ class StoreUserRequest extends FormRequest
 
         return [
             'username' => 'required|string|max:255|unique:users,username,'.$userId,
+            'email' => 'required|email|unique:users,email,'.$userId,
             'department_id' => 'required|exists:departments,id',
             'class' => 'nullable|string|max:255',
             'years_in' => [

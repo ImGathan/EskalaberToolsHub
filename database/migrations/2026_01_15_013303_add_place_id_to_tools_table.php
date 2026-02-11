@@ -12,13 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('tools', function (Blueprint $table) {
-            $table->foreignId('place_id')->nullable()->constrained('places')->onDelete('restrict');
+            $table->foreignId('place_id')->nullable()->constrained('places')->nullOnDelete();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::table('tools', function (Blueprint $table) {

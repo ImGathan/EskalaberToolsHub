@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Stiker QR - {{ $tool->name }}</title>
+    <title>Stiker QR - {{ $data->name }}</title>
     <style>
         /* Hilangkan semua margin default browser & PDF */
         @page {
@@ -75,9 +75,9 @@
 
         <div class="footer">
             <div class="tool-name">
-                {{ \Illuminate\Support\Str::limit($tool->name, 25, '...') }}
+                {{ \Illuminate\Support\Str::limit($data->name, 25, '...') }}
             </div>
-            <div class="asset-id">ID: #{{ str_pad($tool->id, 5, '0', STR_PAD_LEFT) }}</div>
+            <div class="asset-id">ID: #{{ str_pad($data->id, 5, '0', STR_PAD_LEFT) }}</div>
         </div>
     </div>
 </body>

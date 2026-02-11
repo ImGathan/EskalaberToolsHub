@@ -37,6 +37,17 @@
                     @enderror
                 </div>
 
+                <div class="mb-4">
+                    <label for="email" class="block text-sm font-medium mb-2 dark:text-white">Email <span
+                            class="text-red-500">*</span></label>
+                    <input type="email" id="email" name="email" value="{{ $data->email ?? '' }}"
+                        class="py-2.5 sm:py-3 px-4 block w-full border-gray-200 rounded-lg sm:text-sm focus:border-blue-500 focus:ring-blue-500 placeholder-neutral-300 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600 @error('email') border-red-500 @enderror"
+                        placeholder="you@site.com" required>
+                    @error('email')
+                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
                 {{-- Department --}}
                     <div class="mb-4">
                         <label for="department_id" class="block text-sm font-medium mb-2 dark:text-white">Jurusan/Unit <span
@@ -80,16 +91,6 @@
                         @enderror
                     </div>
 
-                <!-- <div class="mb-4">
-                    <label for="email" class="block text-sm font-medium mb-2 dark:text-white">Email <span
-                            class="text-red-500">*</span></label>
-                    <input type="email" id="email" name="email" value="{{ $data->email ?? '' }}"
-                        class="py-2.5 sm:py-3 px-4 block w-full border-gray-200 rounded-lg sm:text-sm focus:border-blue-500 focus:ring-blue-500 placeholder-neutral-300 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600 @error('email') border-red-500 @enderror"
-                        placeholder="you@site.com" required>
-                    @error('email')
-                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                    @enderror
-                </div> -->
 
                 <div class="flex justify-start gap-x-2 mt-4">
                     <a navigate href="{{ route('admin.users.index') }}"

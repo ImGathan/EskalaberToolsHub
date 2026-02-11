@@ -15,6 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
 {
@@ -65,6 +66,7 @@ class UserController extends Controller
 
         User::create([
             'username'      => $request->username,
+            'email'         => $request->email,
             'department_id' => $request->department_id,
             'years_in'      => $request->years_in, 
             'class'         => null,
@@ -125,6 +127,7 @@ class UserController extends Controller
 
         $user->update([
             'username' => $request->username,
+            'email' => $request->email,
             'department_id' => $request->department_id,
             'years_in' => $request->years_in,
             'class' => null,
@@ -147,7 +150,6 @@ class UserController extends Controller
                 ->with('error', ResponseConst::DEFAULT_ERROR_MESSAGE);
         }
 
-        // Check if user is used in categories
         $isUsed = \Illuminate\Support\Facades\DB::table('categories')
             ->where('toolsman_id', $id)
             ->exists();
@@ -158,7 +160,31 @@ class UserController extends Controller
                 ->with('error', ResponseConst::ERROR_MESSAGE_USER_USED);
         }
 
-        $user->delete($id);
+        $isHaveLoans = \Illuminate\Support\Facades\DB::table('loans')
+            ->where('user_id', $id)
+            ->whereIn('status', ['approve', 'returning'])
+            ->exists();
+
+        if ($isHaveLoans) {
+            DB::transaction(function () use ($user) {
+                $loans = $user->loans()->whereIn('status', ['approve', 'returning'])->get();
+               
+                foreach ($loans as $loan) {
+                    $loan->tool()->increment('quantity', $loan->quantity);
+                    
+                    $loan->update([
+                        'status' => 'returned', 
+                        'return_date' => now(),
+                        'keterangan_status' => 'Otomatis Kembali (User Dihapus)'
+                    ]);
+                }
+
+                $user->delete();
+            });
+        } else {
+            $user->delete($id);
+        }
+
 
         return redirect()
             ->route('admin.users.index')

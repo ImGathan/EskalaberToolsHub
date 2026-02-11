@@ -64,7 +64,9 @@
             <thead class="bg-gray-50 dark:bg-neutral-800">
                 <tr>
                     <th scope="col" class="px-6 py-3 text-start text-xs font-semibold uppercase text-gray-800 dark:text-neutral-200">Nama Toolsman</th>
+                    <th scope="col" class="px-6 py-3 text-start text-xs font-semibold uppercase text-gray-800 dark:text-neutral-200">Email</th>
                     <th scope="col" class="px-6 py-3 text-start text-xs font-semibold uppercase text-gray-800 dark:text-neutral-200">Hak Akses</th>
+                    <th scope="col" class="px-6 py-3 text-start text-xs font-semibold uppercase text-gray-800 dark:text-neutral-200">Status</th>
                     <th scope="col" class="px-6 py-3 text-end text-xs font-semibold uppercase text-gray-800 dark:text-neutral-200">Aksi</th>
                 </tr>
             </thead>
@@ -80,9 +82,23 @@
                                 <span class="text-sm font-bold text-gray-800 dark:text-neutral-200">{{ $d->username }}</span>
                             </div>
                         </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-neutral-200">
+                            {{ $d->email }}
+                        </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span class="inline-flex items-center py-1 px-2.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-neutral-800 dark:text-neutral-300">
                                 {{ UserConst::getAccessTypes()[$d->access_type] ?? '-' }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            @php
+                                $statusClasses = match($d->is_active) {
+                                    true => 'bg-teal-100 text-teal-800 dark:bg-teal-500/10 dark:text-teal-500',
+                                    false => 'bg-red-100 text-red-500 dark:bg-red-500/10 dark:text-red-500',
+                                };
+                            @endphp
+                            <span class="inline-flex items-center py-1 px-2.5 rounded-full text-xs font-bold {{ $statusClasses }}">
+                                {{ $d->is_active ? 'Aktif' : 'Tidak Aktif' }}
                             </span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-end text-sm font-medium">

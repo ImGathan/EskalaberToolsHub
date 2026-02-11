@@ -114,12 +114,12 @@ class ToolController extends Controller
     public function generateQR($id)
     {
         $tool = Tool::findOrFail($id);
-        $url = route('user.loans.add', ['tool_id' => $tool->id]);
-        $qrcode = base64_encode(QrCode::format('svg')->size(200)->margin(0)->errorCorrection('H')->generate($url));
+        $qrContent = "SMKN-TOOLS-ID:". $tool->id;
+        
+        $qrcode = base64_encode(QrCode::format('svg')->size(200)->margin(0)->errorCorrection('H')->generate($qrContent));
 
         $data = [
-            'tool' => $tool,
-            'url' => $url,
+            'data' => $tool,
             'qrcode' => $qrcode
         ];
 

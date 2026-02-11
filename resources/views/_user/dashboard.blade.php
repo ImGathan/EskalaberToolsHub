@@ -110,6 +110,11 @@
             xaxis: { categories: @json($chartLabels ?? []) },
             stroke: { curve: 'smooth', width: 3 },
             colors: ['#3b82f6'],
+            dataLabels: { 
+                enabled: false, 
+                style: { colors: ['#3b82f6'] },
+                background: { enabled: true, padding: 4, borderRadius: 2, borderWidth: 0, opacity: 0.9 }
+            },
             fill: { type: 'gradient', gradient: { opacityFrom: 0.4, opacityTo: 0.1 } }
         }).render();
     }

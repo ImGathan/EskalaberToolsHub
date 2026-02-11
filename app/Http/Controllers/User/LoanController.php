@@ -98,7 +98,7 @@ class LoanController extends Controller
         if ($existingLoan) {
             return redirect()->back()
                 ->withInput()
-                ->with('error_duplicate', 'Anda masih memiliki pengajuan pending untuk alat ini.');
+                ->with('error', 'Anda masih memiliki pengajuan pending untuk alat ini.');
         }
 
         $data = $request->all();
