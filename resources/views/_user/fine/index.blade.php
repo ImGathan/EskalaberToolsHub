@@ -80,10 +80,7 @@
                     <th scope="col" class="px-6 py-3 text-start text-xs font-semibold uppercase text-gray-800 dark:text-neutral-200">Barang yang dipinjam</th>
                     <th scope="col" class="px-6 py-3 text-start text-xs font-semibold uppercase text-gray-800 dark:text-neutral-200">Hari Keterlambatan</th>
                     <th scope="col" class="px-6 py-3 text-start text-xs font-semibold uppercase text-gray-800 dark:text-neutral-200">Total Denda</th>
-                    @php
-                        $fineLoan = $fineLoans->first();
-                    @endphp
-                    @if ($fineLoan->fine_status === 1)
+                    @if (($fineLoans->first()?->fine_status ?? null) == 1)
                         <th scope="col" class="px-6 py-3 text-start text-xs font-semibold uppercase text-gray-800 dark:text-neutral-200">Jumlah Bayar</th>
                     @endif
                     <th scope="col" class="px-6 py-3 text-start text-xs font-semibold uppercase text-gray-800 dark:text-neutral-200">Status</th>
@@ -106,7 +103,7 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-neutral-200 font-bold">
                             Rp. {{ number_format($fineLoan->fine_amount, 0, ',', '.') }}
                         </td>
-                        @if ($fineLoan->fine_status === 1)
+                        @if (($fineLoans->first()?->fine_status ?? null) == 1)
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-neutral-200 font-bold">
                             Rp. {{ number_format($fineLoan->amount_paid, 0, ',', '.') }}
                         </td>
