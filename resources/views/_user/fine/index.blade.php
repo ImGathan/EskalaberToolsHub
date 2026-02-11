@@ -113,9 +113,9 @@
                         @endif
                         <td class="px-6 py-4 whitespace-nowrap">
                             @php
-                                $statusClasses = match($fineLoan->fine_status) {
-                                    1 => 'bg-teal-100 text-teal-800 dark:bg-teal-500/10 dark:text-teal-500',
-                                    0 => 'bg-red-100 text-red-500 dark:bg-red-500/10 dark:text-red-500',
+                                $statusClasses = match((bool)$fineLoan->fine_status) {
+                                    true  => 'bg-teal-100 text-teal-800 dark:bg-teal-500/10 dark:text-teal-500',
+                                    false => 'bg-red-100 text-red-500 dark:bg-red-500/10 dark:text-red-500',
                                 };
                             @endphp
                             <span class="inline-flex items-center py-1 px-2.5 rounded-full text-xs font-bold {{ $statusClasses }}">
