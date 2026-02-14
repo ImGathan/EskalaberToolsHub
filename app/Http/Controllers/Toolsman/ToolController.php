@@ -10,6 +10,8 @@ use App\Models\Place;
 use App\Models\Type;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
+use Barryvdh\DomPDF\Facade\Pdf;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class ToolController extends Controller
 {
@@ -132,6 +134,49 @@ class ToolController extends Controller
         }
         $tool->delete($id);
         return redirect()->route('toolsman.tools.index')->with('success', 'Tool deleted successfully');
+    }
+
+    public function generateQR($id)
+    {
+        $tool = Tool::findOrFail($id);
+        $qrContent = "SMKN-TOOLS-ID:". $tool->id;
+        
+        $qrcode = base64_encode(QrCode::format('svg')->size(200)->margin(0)->errorCorrection('H')->generate($qrContent));
+
+        $data = [
+            'data' => $tool,
+            'qrcode' => $qrcode
+        ];
+
+        $customPaper = [0, 0, 300, 300];
+
+        $pdf = Pdf::loadView('_toolsman.tool.generate-qr', $data)->setPaper($customPaper);
+
+        return $pdf->download('Kode QR ' . $tool->name . '.pdf');
+    }
+
+
+    public function moveToBroken(Request $request, $id) {
+        $tool = Tool::findOrFail($id);
+        
+        // Ambil input jumlah yang mau dipindahkan ke rusak
+        $qtyToBroken = (int) $request->broken_qty;
+
+        // Validasi: Jangan sampai mindahin lebih banyak dari stok gudang yang ada
+        if ($qtyToBroken > $tool->quantity) {
+            return back()->with('error', "Jumlah melebihi stok gudang yang tersedia.");
+        }
+
+        if ($qtyToBroken > 0) {
+            // Logika pindah stok: Gudang berkurang, Broken bertambah
+            $tool->quantity -= $qtyToBroken;      
+            $tool->broken_qty += $qtyToBroken;    
+            $tool->save();
+            
+            return back()->with('success', "Berhasil memindahkan $qtyToBroken unit ke daftar perbaikan.");
+        }
+        
+        return back()->with('error', "Jumlah harus lebih dari 0.");
     }
 
 }

@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\ActivityLogController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Toolsman\UserController as ToolsmanUserController;
 use App\Http\Controllers\Toolsman\ToolController as ToolsmanToolController;
+use App\Http\Controllers\Toolsman\MaintenanceToolController as ToolsmanMaintenanceToolController;
 use App\Http\Controllers\Toolsman\LoanController as ToolsmanLoanController;
 use App\Http\Controllers\Toolsman\FineController as ToolsmanFineController;
 use App\Http\Controllers\Toolsman\DashboardController as ToolsmanDashboardController;
@@ -121,6 +122,14 @@ Route::middleware('auth', 'role:TOOLSMAN')->prefix('toolsman')->name('toolsman.'
         Route::get('/update/{id}', [ToolsmanToolController::class, 'update'])->name('update');
         Route::post('/update/{id}', [ToolsmanToolController::class, 'doUpdate'])->name('do_update');
         Route::delete('/delete/{id}', [ToolsmanToolController::class, 'delete'])->name('delete');
+        Route::get('/{id}/generate-qr', [ToolController::class, 'generateQR'])->name('generate-qr');
+        Route::patch('{id}/move-to-broken', [ToolsmanToolController::class, 'moveToBroken'])->name('move-to-broken');
+    });
+
+    Route::prefix('maintenance-tools')->name('maintenance-tools.')->group(function () {
+        Route::get('/', [ToolsmanMaintenanceToolController::class, 'index'])->name('index');
+        Route::patch('{id}/update-qty', [ToolsmanMaintenanceToolController::class, 'updateQty'])->name('update-qty');
+        Route::patch('{id}/restore', [ToolsmanMaintenanceToolController::class, 'restore'])->name('restore');
     });
 
     Route::prefix('loans')->name('loans.')->group(function () {
@@ -130,6 +139,7 @@ Route::middleware('auth', 'role:TOOLSMAN')->prefix('toolsman')->name('toolsman.'
         Route::patch('/{id}/reject', [ToolsmanLoanController::class, 'reject'])->name('reject');
         Route::patch('/{id}/returned', [ToolsmanLoanController::class, 'returned'])->name('returned');
         Route::get('/{id}/late-report', [ToolsmanLoanController::class, 'downloadLateReport'])->name('late-report');
+        Route::get('/export-history', [ToolsmanLoanController::class, 'exportHistoryExcel'])->name('export-history');
     });
 
     Route::prefix('fines')->name('fines.')->group(function () {
@@ -138,6 +148,7 @@ Route::middleware('auth', 'role:TOOLSMAN')->prefix('toolsman')->name('toolsman.'
         Route::patch('/paid/{id}', [ToolsmanFineController::class, 'paid'])->name('paid');
         Route::get('/{id}/unpaid-report', [ToolsmanFineController::class, 'downloadUnpaidReport'])->name('unpaid-report');
         Route::get('/{id}/paid-report', [ToolsmanFineController::class, 'downloadPaidReport'])->name('paid-report');
+        Route::get('/export-paid-fine', [ToolsmanFineController::class, 'exportPaidFineExcel'])->name('export-paid-fine');
     });
 
     Route::prefix('profile')->name('profile.')->group(function () {
@@ -174,6 +185,7 @@ Route::middleware('auth', 'role:USER')->prefix('user')->name('user.')->group(fun
     Route::prefix('fines')->name('fines.')->group(function () {
         Route::get('/', [UserFineController::class, 'index'])->name('index');
         Route::get('/pay/{id}', [UserFineController::class, 'pay'])->name('pay');
+        Route::get('/{id}/paid-report', [UserFineController::class, 'downloadPaidReport'])->name('paid-report');
     });
     
 });

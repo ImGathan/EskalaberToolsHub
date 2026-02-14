@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Response;
 use Midtrans\Snap;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class FineController extends Controller
 {
@@ -80,5 +81,26 @@ class FineController extends Controller
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
+
+    public function downloadPaidReport($id)
+    {
+        $loan = Loan::with(['user', 'tool'])->findOrFail($id);
+
+        if ($loan->fine_status === 0) {
+            return back()->with('error', 'Peminjaman ini belum lunas.');
+        }
+
+        $data = [
+            'title' => 'Laporan Denda Keterlambatan',
+            'date' => date('d/m/Y'),
+            'loan' => $loan
+        ];
+
+        $pdf = Pdf::loadView('_user.fine.lunas_report', $data)
+                ->setPaper('a4', 'portrait');
+
+        return $pdf->download('Laporan_Pembayaran_Denda_' . $loan->user->username . '_' . date('Ymd') . '.pdf');
+    }
+
 
 }

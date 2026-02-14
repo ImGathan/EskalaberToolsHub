@@ -6,10 +6,12 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Tool;
 use App\Models\Loan;
-use App\MOdels\ActivityLog;
+use App\Models\ActivityLog;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Exports\LoanExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class LoanController extends Controller
 {
@@ -44,6 +46,7 @@ class LoanController extends Controller
                 });
             })
             ->orderBy('loan_date', 'desc')
+            ->orderBy('created_at', 'desc')
             ->paginate(10)->withQueryString();
 
         
@@ -60,7 +63,6 @@ class LoanController extends Controller
         $countReject = Loan::whereHas('tool.category.toolsman', function($query) use ($userId) {
             $query->where('toolsman_id', $userId);
         })->where('status', 'reject')->count();
-
         
         return view('_toolsman.loan.index', compact('keywords','loans', 'countPending', 'countOnLoan', 'countReject'));
     }
@@ -115,25 +117,46 @@ class LoanController extends Controller
         return redirect()->route('toolsman.loans.index', ['status' => 'history'])->with('success', 'Peminjaman berhasil ditolak.');
     }
 
-    public function returned ($id) 
+    public function returned(Request $request, $id) 
     {
         $loan = Loan::findOrFail($id);
 
-        DB::transaction(function() use ($loan) {
-   
+        // 1. Validasi: Jumlah harus angka dan totalnya pas
+        $request->validate([
+            'qty_good' => 'required|integer|min:0',
+            'qty_damaged' => 'required|integer|min:0',
+            'qty_lost' => 'required|integer|min:0',
+        ]);
+
+        $totalInput = $request->qty_good + $request->qty_damaged + $request->qty_lost;
+
+        if ($totalInput != $loan->quantity) {
+            return back()->with('error', 'Total jumlah (Bagus + Rusak + Hilang) harus berjumlah ' . $loan->quantity);
+        }
+
+        
+        DB::transaction(function() use ($loan, $request) {
+            
+            $dendaKerusakan = ($request->qty_lost * 100000) + ($request->qty_damaged * 50000);
+            $totalDendaBaru = $loan->fine_amount + $dendaKerusakan;
+
             $loan->update([
                 'status' => 'returned',
-                'return_date' => now()
+                'return_date' => now(),
+                'qty_good' => $request->qty_good,
+                'qty_damaged' => $request->qty_damaged,
+                'qty_lost' => $request->qty_lost,
+                'fine_amount' => $totalDendaBaru,
             ]);
 
-            $tool = $loan->tool()->first();
-            $tool->quantity = $tool->quantity + $loan->quantity;
+            $tool = $loan->tool;
+            $tool->quantity += $request->qty_good;
+            $tool->broken_qty += $request->qty_damaged;
             $tool->status = ($tool->quantity <= 0) ? 'Tidak Tersedia' : 'Tersedia';
-            $tool->save(); 
+            $tool->save();
         });
 
-        ActivityLog::record( 'Pengembalian Pinjaman', Auth::user()->username . ' menyetujui pengembalian pinjaman oleh ' . $loan->user->username . ' yaitu ' . $loan->tool->name . ' sebanyak ' . $loan->quantity . ' unit.');
-        return redirect()->route('toolsman.loans.index', ['status' => 'history'])->with('success', 'Peminjaman berhasil dikembalikan.');
+        return redirect()->route('toolsman.loans.index', ['status' => 'history'])->with('success', 'Barang berhasil dikembalikan ke gudang.');
     }
 
 
@@ -155,6 +178,17 @@ class LoanController extends Controller
                 ->setPaper('a4', 'portrait');
 
         return $pdf->download('Laporan_Terlambat_' . $loan->user->username . '_' . date('Ymd') . '.pdf');
+    }
+
+    public function exportHistoryExcel()
+    {
+        $userId = Auth::user()->id;
+        $date = date('d-m-Y');
+        
+        // Nama file agar lebih spesifik
+        $fileName = 'Laporan_History_Peminjaman_' . $date . '.xlsx';
+        
+        return Excel::download(new LoanExport($userId), $fileName);
     }
 
 }

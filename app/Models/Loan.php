@@ -24,6 +24,9 @@ class Loan extends Model
         'fine_status',
         'fine_paid_at',
         'amount_paid',
+        'qty_good',      
+        'qty_damaged',   
+        'qty_lost',
     ];
 
     // WAJIB ADA: Agar Laravel tahu kolom ini adalah tanggal
@@ -85,7 +88,7 @@ class Loan extends Model
                     $hariTerlambat = abs((int) $batasWaktu->diffInDays($due));
                     $totalDenda = $hariTerlambat * $loan->tool->fine * $loan->quantity;
 
-                    if ($loan->fine_amount != $totalDenda) {
+                    if ($loan->fine_amount != $totalDenda && $loan->status !== 'returned') {
                         $loan->fine_amount = $totalDenda;
                         $loan->information = "Terlambat $hariTerlambat hari. Denda: Rp " . number_format($totalDenda, 0, ',', '.');
                         $loan->saveQuietly(); 
@@ -132,7 +135,7 @@ class Loan extends Model
 
             if ($batasWaktu->greaterThan($dueDate)) {
                 $days = abs($batasWaktu->diffInDays($dueDate));
-                return "Terlambat " . $days . " Hari";
+                return "Dikembalikan Terlambat " . $days . " Hari";
             }
 
             return 'Dikembalikan Tepat Waktu';
@@ -164,6 +167,9 @@ class Loan extends Model
                 if ($compareDate->greaterThan($due)) {
                     return 'text-red-700 dark:text-red-500';
                 }
+                if ($this->fine_amount > 0) {
+                    return 'text-red-700 dark:text-red-500';
+                }
                 return 'text-green-700 dark:text-green-500';
 
             default:
@@ -193,6 +199,16 @@ class Loan extends Model
     {
         $hashids = new \Hashids\Hashids('salt-kamu', 5);
         return $hashids->encode($this->id);
+    }
+
+    public function getDendaKerusakanAttribute()
+    {
+        return (int)($this->qty_damaged ?? 0) * 50000;
+    }
+
+    public function getDendaKehilanganAttribute()
+    {
+        return (int)($this->qty_lost ?? 0) * 100000;
     }
 
 }

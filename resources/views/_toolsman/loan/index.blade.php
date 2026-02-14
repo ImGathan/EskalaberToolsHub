@@ -74,6 +74,16 @@
                         Reset
                     </a>
                 @endif
+
+                @if (request('status') === 'history')
+                <a href="{{ route('toolsman.loans.export-history') }}" 
+                    class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-50 disabled:pointer-events-none focus:outline-none focus:ring-2 focus:ring-emerald-500 shadow-sm transition-all">
+                    <svg class="flex-shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/>
+                    </svg>
+                    Export Excel
+                </a>
+                @endif
             </div>
         </form>
     </div>
@@ -116,7 +126,7 @@
                             @elseif($loan->status === 'approve')
                                 <span class="inline-flex items-center py-1 rounded-full text-sm font-medium {{ $loan->status_color }}">{{ $loan->keterangan_status }}</span>
                             @elseif($loan->status === 'returned' && $loan->fine_amount > 0)
-                                <span class="inline-flex items-center py-1 rounded-full text-sm font-medium {{ $loan->status_color }}">Dikembalikan {{ $loan->keterangan_status }}</span>
+                                <span class="inline-flex items-center py-1 rounded-full text-sm font-medium {{ $loan->status_color }}">{{ $loan->keterangan_status }}</span>
                             @elseif($loan->status === 'returned')
                                 <span class="inline-flex items-center py-1 rounded-full text-sm font-medium {{ $loan->status_color }}">{{ $loan->keterangan_status }}</span>
                             @else
@@ -170,15 +180,14 @@
                             @endif
                             
                             @if($loan->status === 'returning')
-                            <form action="{{ route('toolsman.loans.returned', $loan->id) }}" method="POST">
-                                @csrf
-                                @method('PATCH')
-                                <button type="submit" 
-                                    class="py-1.5 px-3 inline-flex items-center gap-x-1 text-xs font-bold rounded-lg border border-transparent bg-blue-100 text-blue-600 hover:bg-blue-200 dark:bg-blue-900/30 dark:text-blue-500 cursor-pointer">
-                                    Konfirmasi Pengembalian
-                                </button>
-                            </form>
+                            <button type="button" 
+                                data-hs-overlay="#hs-modal-return-{{ $loan->id }}"
+                                class="py-1.5 px-3 inline-flex items-center gap-x-1 text-xs font-bold rounded-lg border border-transparent bg-blue-100 text-blue-600 hover:bg-blue-200 dark:bg-blue-900/30 dark:text-blue-500 cursor-pointer">
+                                Konfirmasi Pengembalian
+                            </button>
                             @endif
+                            
+                            @include('_toolsman.loan._modal_return', ['loan' => $loan])
 
                             @if($loan->status === 'returned' && $loan->fine_amount > 0 && $loan->fine_status === 0)
                             <div class="hs-dropdown relative inline-flex">

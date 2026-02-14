@@ -2,6 +2,22 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 <head>
+
+    <script>
+        (function() {
+            // Preline menggunakan kunci 'hs_theme' secara default
+            const savedTheme = localStorage.getItem('hs_theme') || 'default';
+            const isDark = savedTheme === 'dark' || 
+                (savedTheme === 'default' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+            if (isDark) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        })();
+    </script>
+
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 

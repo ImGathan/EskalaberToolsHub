@@ -121,7 +121,7 @@
                                     @elseif ($loan->status === 'returned' && $loan->fine_amount > 0)
                                     <span class="inline-flex items-center gap-x-1.5 py-1.5 px-3 rounded-full text-xs font-bold bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-500">
                                         <span class="size-1.5 rounded-full bg-red-600 "></span>
-                                        Dikembalikan {{ $loan->keterangan_status }}
+                                        {{ $loan->keterangan_status }}
                                     </span>
                                     @elseif ($loan->status === 'reject')
                                     <span class="inline-flex items-center gap-x-1.5 py-1.5 px-3 rounded-full text-xs font-bold bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400">

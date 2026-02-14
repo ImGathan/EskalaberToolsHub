@@ -8,6 +8,8 @@ use App\Models\Loan;
 use App\Models\ActivityLog;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Exports\FineExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class FineController extends Controller
 {
@@ -112,6 +114,17 @@ class FineController extends Controller
                 ->setPaper('a4', 'portrait');
 
         return $pdf->download('Laporan_Pembayaran_Denda_' . $loan->user->username . '_' . date('Ymd') . '.pdf');
+    }
+
+    public function exportPaidFineExcel()
+    {
+        $userId = Auth::user()->id;
+        $date = date('d-m-Y');
+        
+        // Nama file agar lebih spesifik
+        $fileName = 'Laporan_Denda_Keterlambatan_' . $date . '.xlsx';
+        
+        return Excel::download(new FineExport($userId), $fileName);
     }
 
 }

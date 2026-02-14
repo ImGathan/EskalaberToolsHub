@@ -31,7 +31,7 @@ class AuthController extends Controller
         }
 
         return back()->withErrors([
-            'login_error' => 'Username atau Password tidak sesuai, periksa kembali',
+            'login_error' => 'Akses tidak sesuai, periksa kembali',
         ])->onlyInput('email');
     }
 

@@ -110,12 +110,6 @@
                     <div class="p-6 space-y-4">
                         {{-- Item List --}}
                         <div class="space-y-3">
-                            <div class="flex justify-between items-center text-sm">
-                                <div class="flex flex-col">
-                                    <span class="text-gray-500">Biaya Layanan Pinjam</span>
-                                </div>
-                                <span class="font-bold text-emerald-600 uppercase text-xs">Gratis</span>
-                            </div>
 
                             <div class="flex justify-between items-center text-sm">
                                 <div class="flex flex-col">
@@ -126,19 +120,35 @@
 
                             <div class="flex justify-between items-center text-sm">
                                 <div class="flex flex-col">
-                                    <span class="text-gray-500">Denda Per Hari</span>
-                                </div>
-                                <span class="font-semibold text-gray-800 dark:text-neutral-200">Rp {{ number_format($data->tool->fine, 0, ',', '.') }}</span>
-                            </div>
-
-                            <div class="flex justify-between items-center text-sm">
-                                <div class="flex flex-col">
                                     <span class="text-gray-500">Total Keterlambatan</span>
                                 </div>
                                 <span class="font-bold {{ $data->hari_terlambat > 0 ? 'text-red-600' : 'text-gray-800 dark:text-neutral-200' }}">
                                     {{ $data->hari_terlambat }} Hari
                                 </span>
                             </div>
+
+                            <div class="flex justify-between items-center text-sm">
+                                <div class="flex flex-col">
+                                    <span class="text-gray-500">Denda Keterlambatan</span>
+                                </div>
+                                <span class="font-semibold text-gray-800 dark:text-neutral-200">Rp {{ number_format($data->tool->fine * $data->hari_terlambat, 0, ',', '.') }}</span>
+                            </div>
+
+                            
+                            <div class="flex justify-between items-center text-sm">
+                                <div class="flex flex-col">
+                                    <span class="text-gray-500">Denda Kerusakan</span>
+                                </div>
+                                <span class="font-semibold text-gray-800 dark:text-neutral-200">Rp {{ number_format($data->denda_kerusakan, 0, ',', '.') }}</span>
+                            </div>
+                            
+                            <div class="flex justify-between items-center text-sm">
+                                <div class="flex flex-col">
+                                    <span class="text-gray-500">Denda Kehilangan</span>
+                                </div>
+                                <span class="font-semibold text-gray-800 dark:text-neutral-200">Rp {{ number_format($data->denda_kehilangan, 0, ',', '.') }}</span>
+                            </div>
+                            
                         </div>
 
                         {{-- Divider --}}

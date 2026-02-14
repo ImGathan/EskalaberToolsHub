@@ -2,6 +2,22 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth">
 
 <head>
+
+    <script>
+        (function() {
+            // Preline menggunakan kunci 'hs_theme' secara default
+            const savedTheme = localStorage.getItem('hs_theme') || 'default';
+            const isDark = savedTheme === 'dark' || 
+                (savedTheme === 'default' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+            if (isDark) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        })();
+    </script>
+
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ config('app.name', 'EskalaberToolsHub') }}</title>
@@ -19,6 +35,7 @@
     <!-- Styles / Scripts -->
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+
     @else
     <!-- Fallback styles would go here -->
     @endif
@@ -38,7 +55,7 @@
 
         <div class="relative z-10 flex flex-col items-center">
             
-            <img src="{{ asset('admin/images/logo.webp') }}" alt="" class="h-40 dark:brightness-1000">
+            <img src="{{ asset('admin/images/logo.webp') }}" alt="" class="h-28 md:h-40 dark:brightness-1000">
 
             <div class="relative mb-16 flex items-center justify-center">
         
@@ -862,7 +879,8 @@
             sections.forEach(section => observer.observe(section));
         });
 
-        if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+
+        if (localStorage.getItem('hs_theme') === 'dark' || (!('hs_theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
             document.documentElement.classList.add('dark');
         } else {
             document.documentElement.classList.remove('dark');
@@ -871,8 +889,8 @@
         const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
         const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
 
-        // Change the icons inside the button based on previous settings
-        if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        // 2. UBAH DI SINI: Atur ikon (Ganti 'color-theme' jadi 'hs_theme')
+        if (localStorage.getItem('hs_theme') === 'dark' || (!('hs_theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
             themeToggleLightIcon.classList.remove('hidden');
         } else {
             themeToggleDarkIcon.classList.remove('hidden');
@@ -881,33 +899,31 @@
         const themeToggleBtn = document.getElementById('theme-toggle');
 
         themeToggleBtn.addEventListener('click', function() {
-            // toggle icons inside button
+            // Toggle icons
             themeToggleDarkIcon.classList.toggle('hidden');
             themeToggleLightIcon.classList.toggle('hidden');
 
-            // if set via local storage previously
-            if (localStorage.getItem('color-theme')) {
-                if (localStorage.getItem('color-theme') === 'light') {
+            // 3. UBAH DI SINI: Logika simpan tema (Ganti 'color-theme' jadi 'hs_theme')
+            if (localStorage.getItem('hs_theme')) {
+                if (localStorage.getItem('hs_theme') === 'light') {
                     document.documentElement.classList.add('dark');
-                    localStorage.setItem('color-theme', 'dark');
+                    localStorage.setItem('hs_theme', 'dark');
                 } else {
                     document.documentElement.classList.remove('dark');
-                    localStorage.setItem('color-theme', 'light');
+                    localStorage.setItem('hs_theme', 'light');
                 }
-
-                // if NOT set via local storage previously
             } else {
                 if (document.documentElement.classList.contains('dark')) {
                     document.documentElement.classList.remove('dark');
-                    localStorage.setItem('color-theme', 'light');
+                    localStorage.setItem('hs_theme', 'light');
                 } else {
                     document.documentElement.classList.add('dark');
-                    localStorage.setItem('color-theme', 'dark');
+                    localStorage.setItem('hs_theme', 'dark');
                 }
             }
         });
 
-        // Mobile menu toggle
+        
         const btn = document.querySelector("button.mobile-menu-button");
         const menu = document.querySelector("#mobile-menu");
 
