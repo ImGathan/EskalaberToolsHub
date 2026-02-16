@@ -111,6 +111,14 @@
                                     class="p-2 inline-flex items-center rounded-lg border border-gray-200 bg-white text-gray-800 hover:bg-gray-100 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300" title="View">
                                     @include('_admin._layout.icons.view_detail')
                                 </a>
+                                <form action="{{ route('admin.users.resetPassword', $d->id) }}" method="POST" class="inline" navigate-form>
+                                    @csrf
+                                    <button type="submit" 
+                                            class="p-2 inline-flex items-center rounded-lg border border-yellow-200 bg-yellow-50 text-yellow-600 hover:bg-yellow-100 dark:bg-yellow-900/20 dark:border-yellow-800 dark:text-yellow-500" 
+                                            title="Reset Password">
+                                        @include('_admin._layout.icons.reset')
+                                    </button>
+                                </form>
                                 <a navigate href="{{ route('admin.users.update', $d->id) }}" 
                                     class="p-2 inline-flex items-center rounded-lg border border-blue-200 bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-500" title="Edit">
                                     @include('_admin._layout.icons.pencil')
